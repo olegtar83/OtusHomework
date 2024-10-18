@@ -62,12 +62,7 @@ builder.Services.AddSwaggerGen(c =>
     {
         Version = "v1",
         Title = "Legendary.Social.Network",
-        Description = "",
-        Contact = new OpenApiContact
-        {
-            Name = "Ivan Trushin",
-            Email = "ivan.v.trushin@yandex.ru",
-        }
+        Description = ""
     });
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {

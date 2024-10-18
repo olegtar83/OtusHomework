@@ -26,7 +26,7 @@ services:
     restart: always
     environment:
       # Основные настройки для работы API
-      ASPNETCORE_URLS: "http://+:5000"
+      ASPNETCORE_URLS: "http://+:7888"
       AllowedHosts: "*" # Ограничивает хосты, которые могут подключаться к API. По умолчанию - все
       # Строка подключения к базе данных Postgres
       DatabaseSettings:ConnStr: "Host=legendary-db;Port=5432;Username=dbuser;Password=dbpassword;Database=legendarydb;Pooling=true;"
@@ -36,7 +36,7 @@ services:
       JWTSettings:Audience: legendary.social.network
       JWTSettings:DurationInMinutes: "60"
     ports:
-      - 5000:5000
+      - 7888:7888
     mem_limit: 1024m
     entrypoint: dotnet LegendarySocialNetwork.dll
     depends_on:

@@ -20,8 +20,8 @@ services:
   legendary-api:
     image: legendary-api-image
     build:
-      context: ./
-      dockerfile: ./Dockerfile
+      context: ./src/LegendarySocialNetwork
+      dockerfile: Dockerfile
     container_name: legendary-api
     restart: always
     environment:
@@ -31,7 +31,7 @@ services:
       # Строка подключения к базе данных Postgres
       DatabaseSettings:ConnStr: "Host=legendary-db;Port=5432;Username=dbuser;Password=dbpassword;Database=legendarydb;Pooling=true;"
       # Настройки генерации токена авторизации
-      JWTSettings:Key: "verystrongkeyforauthtoken"
+      JWTSettings:Key: "superSecretKey@34512312312312312"
       JWTSettings:Issuer: legendary.social.network
       JWTSettings:Audience: legendary.social.network
       JWTSettings:DurationInMinutes: "60"

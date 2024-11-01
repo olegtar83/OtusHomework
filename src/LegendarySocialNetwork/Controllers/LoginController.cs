@@ -53,7 +53,7 @@ public class LoginController : ControllerBase
         return new JwtSecurityToken(
             issuer: _jwtSettings.Issuer,
             audience: _jwtSettings.Audience,
-            expires: DateTime.Now.AddDays(1),
+            expires: DateTime.Now.AddMinutes(Convert.ToInt32(_jwtSettings.DurationInMinutes)),
             signingCredentials: signinCredentials
         );
     }

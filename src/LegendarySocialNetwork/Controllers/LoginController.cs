@@ -34,14 +34,7 @@ public class LoginController : ControllerBase
             var isPasswordOk = _pass.VerifyHashedPassword(result.Value!.Password, data.Password);
             if (isPasswordOk)
             {
-                var user = await _db.GetUserAsync(data.Id);
-
-                var claims = new List<Claim> {
-                   new(ClaimTypes.Name, $"{user.Value.First_name} {user.Value.Second_name}"),
-                   new(ClaimTypes.Role, "User")
-                };
-
-                var jwt = GenerateJWToken(result.Value!.Id, claims);
+                var jwt = GenerateJWToken(result.Value!.Id);
                 var token = new JwtSecurityTokenHandler().WriteToken(jwt);
                 return Ok(new LoginRes(token));
             }
@@ -53,14 +46,13 @@ public class LoginController : ControllerBase
         return BadRequest("No login");
     }
 
-    private JwtSecurityToken GenerateJWToken(string userId, List<Claim> claims)
+    private JwtSecurityToken GenerateJWToken(string userId)
     {
         var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
         var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
         return new JwtSecurityToken(
             issuer: _jwtSettings.Issuer,
             audience: _jwtSettings.Audience,
-            claims: claims,
             expires: DateTime.Now.AddDays(1),
             signingCredentials: signinCredentials
         );

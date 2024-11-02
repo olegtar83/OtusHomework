@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Text;
 
 namespace LegendarySocialNetwork.Controllers;
@@ -41,7 +40,7 @@ public class LoginController : ControllerBase
         }
         else
         {
-            return BadRequest(result.Errors.First().ToString());
+            return BadRequest(result.Error);
         }
         return BadRequest("No login");
     }

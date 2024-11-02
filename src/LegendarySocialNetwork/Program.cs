@@ -4,8 +4,6 @@ using LegendarySocialNetwork.Filters;
 using LegendarySocialNetwork.Middlewares;
 using LegendarySocialNetwork.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;

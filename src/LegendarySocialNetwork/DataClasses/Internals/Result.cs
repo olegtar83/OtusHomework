@@ -18,7 +18,7 @@
         public bool Succeeded { get; set; } = default!;
         public T Value { get; set; } = default!;
 
-        public string[] Errors { get; set; }
+        private string[] Errors { get; set; }
 
         public static Result<T> Success(T value)
         {
@@ -34,5 +34,7 @@
         {
             return new Result<T>(false, new string[] { error });
         }
+
+        public string Error => string.Join(',', Errors);
     }
 }

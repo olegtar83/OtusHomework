@@ -44,7 +44,7 @@ public class UserController : ControllerBase
     public async Task<IActionResult> GetUser(Guid id)
     {
         var result = await _db.GetUserAsync(id.ToString());
-        if (!result.Succeeded) return BadRequest(new ErrorRes(result.Errors.First()));
+        if (!result.Succeeded) return BadRequest(new ErrorRes(result.Error));
 
         var res = _mapper.Map<UserDto>(result.Value);
         return Ok(res);

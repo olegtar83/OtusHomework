@@ -1,22 +1,19 @@
 {
 	"info": {
-		"_postman_id": "468d7e63-3158-416a-b282-c5e41fde6f28",
-		"name": "Legendary Social Network",
+		"_postman_id": "caf667be-2ecd-48e6-9374-f5a61f699354",
+		"name": "otus lesson 1",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "2464907"
+		"_exporter_id": "336111"
 	},
 	"item": [
 		{
-			"name": "Login",
-			"protocolProfileBehavior": {
-				"strictSSL": false
-			},
+			"name": "register",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"Id\": \"a8edbe9c-2700-474b-ad06-b1d74dab2b79\",\r\n    \"Password\": \"qwerty\"\r\n}",
+					"raw": "{\r\n  \"first_name\": \"Oleg\",\r\n  \"second_name\": \"Tarrr\",\r\n  \"age\": 35,\r\n  \"sex\": \"male\",\r\n  \"biography\": \"string\",\r\n  \"city\": \"petah tiqa\",\r\n  \"password\": \"string\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -24,12 +21,41 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:5000/login",
+					"raw": "http://localhost:7888/user/register",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "5000",
+					"port": "7888",
+					"path": [
+						"user",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"id\": \"733ea22c-a010-486a-a495-2a26c973f4cb\",\r\n  \"password\": \"string\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:7888/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "7888",
 					"path": [
 						"login"
 					]
@@ -38,14 +64,14 @@
 			"response": []
 		},
 		{
-			"name": "Get User by Id",
+			"name": "New Request",
 			"request": {
 				"auth": {
 					"type": "bearer",
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYmYiOjE3MDkxNTUxMDAsImV4cCI6MTcwOTE1ODcwMCwiaXNzIjoib3R1cy5zb2NpYWwubmV0d29yayIsImF1ZCI6Im90dXMuc29jaWFsLm5ldHdvcmsifQ.ulyynuJFmBwKfQJvF8tz85NZqc1uSz6ZiGbszLIhKdM",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzA4MTA5NjYsImlzcyI6ImxlZ2VuZGFyeS5zb2NpYWwubmV0d29yayIsImF1ZCI6ImxlZ2VuZGFyeS5zb2NpYWwubmV0d29yayJ9.m8a-hp9UvJ-iQIf9Yp2K9xiOc-ldK17st8zx5N-a-Qk",
 							"type": "string"
 						}
 					]
@@ -53,85 +79,16 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:5000/user/get/a8edbe9c-2700-474b-ad06-b1d74dab2b79",
+					"raw": "http://localhost:7888/user/get/733ea22c-a010-486a-a495-2a26c973f4cb",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "5000",
+					"port": "7888",
 					"path": [
 						"user",
 						"get",
-						"a8edbe9c-2700-474b-ad06-b1d74dab2b79"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Search",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYmYiOjE3MDkxNTUxMDAsImV4cCI6MTcwOTE1ODcwMCwiaXNzIjoib3R1cy5zb2NpYWwubmV0d29yayIsImF1ZCI6Im90dXMuc29jaWFsLm5ldHdvcmsifQ.ulyynuJFmBwKfQJvF8tz85NZqc1uSz6ZiGbszLIhKdM",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:5000/user/search?firstName=Авд&lastName=А",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "5000",
-					"path": [
-						"user",
-						"search"
-					],
-					"query": [
-						{
-							"key": "firstName",
-							"value": "Авд"
-						},
-						{
-							"key": "lastName",
-							"value": "А"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Register",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"first_name\": \"qwerty\",\r\n    \"second_name\": \"qwerty\",\r\n    \"age\": 89,\r\n    \"sex\": \"qwerty\",\r\n    \"biography\": \"qwerty\",\r\n    \"city\": \"qwerty\",\r\n    \"password\": \"qwerty\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:5000/user/register",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "5000",
-					"path": [
-						"user",
-						"register"
+						"733ea22c-a010-486a-a495-2a26c973f4cb"
 					]
 				}
 			},

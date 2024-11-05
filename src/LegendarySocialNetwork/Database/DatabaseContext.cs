@@ -25,7 +25,7 @@ public class DatabaseContext : IDatabaseContext, IDisposable
     {
         await using var con = await db.OpenConnectionAsync();
         var sql = "SELECT id, \"password\" FROM public.account WHERE id = @id LIMIT 1;";
-        var item = await con.QueryFirstAsync<AccountEntity>(sql, new { id });
+        var item = await con.QueryFirstOrDefaultAsync<AccountEntity>(sql, new { id });
         if (item is not null) { return Result<AccountEntity>.Success(item); }
         return Result<AccountEntity>.Failure("Not found");
     }

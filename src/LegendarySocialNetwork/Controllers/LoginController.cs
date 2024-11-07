@@ -1,4 +1,5 @@
-﻿using LegendarySocialNetwork.Database;
+﻿using LegendarySocialNetwork.Auxillary;
+using LegendarySocialNetwork.Database;
 using LegendarySocialNetwork.DataClasses.Internals;
 using LegendarySocialNetwork.DataClasses.Requests;
 using LegendarySocialNetwork.DataClasses.Responses;
@@ -33,7 +34,7 @@ public class LoginController : ControllerBase
             var isPasswordOk = _pass.VerifyHashedPassword(result.Value!.Password, data.Password);
             if (isPasswordOk)
             {
-                var jwt = GenerateJWToken(result.Value!.Id);
+                var jwt = JwtHelper.GenerateJWToken();
                 var token = new JwtSecurityTokenHandler().WriteToken(jwt);
                 return Ok(new LoginRes(token));
             }
@@ -45,15 +46,5 @@ public class LoginController : ControllerBase
         return BadRequest("No login");
     }
 
-    private JwtSecurityToken GenerateJWToken(string userId)
-    {
-        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
-        var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
-        return new JwtSecurityToken(
-            issuer: _jwtSettings.Issuer,
-            audience: _jwtSettings.Audience,
-            expires: DateTime.Now.AddMinutes(Convert.ToInt32(_jwtSettings.DurationInMinutes)),
-            signingCredentials: signinCredentials
-        );
-    }
+   
 }

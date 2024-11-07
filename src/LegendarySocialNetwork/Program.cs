@@ -1,9 +1,11 @@
+using LegendarySocialNetwork.Auxillary;
 using LegendarySocialNetwork.Database;
 using LegendarySocialNetwork.DataClasses.Internals;
 using LegendarySocialNetwork.Filters;
 using LegendarySocialNetwork.Middlewares;
 using LegendarySocialNetwork.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -24,6 +26,9 @@ builder.Services.AddControllers(options =>
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.Configure<JWTSettings>(config.GetSection("JWTSettings"));
+
+builder.Configuration.GetSection(nameof(JWTSettings)).Bind(JwtHelper.JWTSettings);
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

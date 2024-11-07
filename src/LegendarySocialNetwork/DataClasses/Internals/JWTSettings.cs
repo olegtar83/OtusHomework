@@ -2,8 +2,8 @@
 
 public class JWTSettings
 {
-    public required string Key { get; set; }
-    public required string Issuer { get; set; }
-    public required string Audience { get; set; }
-    public required double DurationInMinutes { get; set; }
+    public string Key { get; set; } = string.Empty;
+    public string Issuer { get; set; } = string.Empty;
+    public string Audience { get; set; } = string.Empty;
+    public double DurationInMinutes { get; set; }
 }

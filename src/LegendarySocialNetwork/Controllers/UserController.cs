@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using LegendarySocialNetwork.Auxillary;
 using LegendarySocialNetwork.Database;
 using LegendarySocialNetwork.Database.Entities;
 using LegendarySocialNetwork.DataClasses.Dtos;
@@ -8,6 +9,7 @@ using LegendarySocialNetwork.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace LegendarySocialNetwork.Controllers;
 
@@ -34,7 +36,9 @@ public class UserController : ControllerBase
         var result = await _db.RegisterAsync(user, password);
         if (result.Succeeded)
         {
-            return Ok(new RegisterRes(result.Value));
+            var jwt = JwtHelper.GenerateJWToken();
+            var token = new JwtSecurityTokenHandler().WriteToken(jwt);
+            return Ok(new RegisterRes(result.Value, token));
         }
         return BadRequest();
     }

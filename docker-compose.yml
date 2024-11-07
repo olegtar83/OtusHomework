@@ -43,6 +43,15 @@ services:
       - legendary-db
     networks:
       - legendary-network
+  legendary-react-app:
+    build:
+      context: ./legendary-client  # Update this to the path where your React app is located
+      dockerfile: Dockerfile  # Make sure you have a Dockerfile in this directory for your React app
+    container_name: legendary-react-app
+    ports:
+      - 3000:80  # Map port 3000 on the host to port 80 in the container
+    networks:
+      - legendary-network    
 networks:
   legendary-network:
     driver: bridge

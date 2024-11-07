@@ -1,0 +1,43 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-left h1 {
+  margin: 0;
+  color: #1a73e8;
+}
+
+.nav-center input {
+  padding: 0.5rem 1rem;
+  width: 300px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  outline: none;
+}
+
+.nav-right {
+  display: flex;
+  gap: 1rem;
+}
+
+.nav-right button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 20px;
+  background-color: #1a73e8;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.nav-right button:hover {
+  background-color: #1557b0;
+} 

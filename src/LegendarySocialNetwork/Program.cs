@@ -5,6 +5,7 @@ using LegendarySocialNetwork.Filters;
 using LegendarySocialNetwork.Middlewares;
 using LegendarySocialNetwork.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -28,6 +29,21 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.Configure<JWTSettings>(config.GetSection("JWTSettings"));
 
 builder.Configuration.GetSection(nameof(JWTSettings)).Bind(JwtHelper.JWTSettings);
+
+
+builder.Services.AddProblemDetails(options =>
+{
+    options.CustomizeProblemDetails = context =>
+    {
+        context.ProblemDetails.Instance = $"{context.HttpContext.Request.Method} {context.HttpContext.Request.Path}";
+
+        context.ProblemDetails.Extensions.TryAdd("requestId", context.HttpContext.TraceIdentifier);
+
+        var activity = context.HttpContext.Features.Get<IHttpActivityFeature>()?.Activity;
+
+        context.ProblemDetails.Extensions.TryAdd("activityId", activity?.Id);
+    };
+});
 
 builder.Services.AddAuthentication(options =>
 {

@@ -10,15 +10,17 @@ public class DatabaseContext : IDatabaseContext, IDisposable
 {
     public DatabaseContext(IOptions<DatabaseSettings> settings)
     {
-        connStr = settings.Value.ConnStr;
+        var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
+        var connStr = settings.Value.ConnStr;
+        var dataSourceBuilder = new NpgsqlDataSourceBuilder(connStr);
+        dataSourceBuilder.UseLoggerFactory(loggerFactory);
 
-        db = NpgsqlDataSource.Create(connStr);
+        db = dataSourceBuilder.Build();
     }
-    private readonly string connStr;
     private readonly NpgsqlDataSource db;
     public async void Dispose()
     {
-        await this.db.DisposeAsync();
+        await db.DisposeAsync();
     }
 
     public async Task<Result<AccountEntity>> GetLoginAsync(string id)

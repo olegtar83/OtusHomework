@@ -4,17 +4,17 @@ FROM node:20-alpine AS build
 # Set working directory
 WORKDIR /app
 
-# Copy package files
+# Copy only package files first for caching
 COPY package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy source code
+# Now copy the rest of the application code
 COPY . .
 
 # Build the application
-RUN npm run build
+RUN npm ci
 
 # Production stage
 FROM nginx:alpine

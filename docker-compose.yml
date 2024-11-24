@@ -8,11 +8,13 @@ services:
       POSTGRES_DB: "legendarydb"
       POSTGRES_USER: "dbuser"
       POSTGRES_PASSWORD: "dbpassword"
-    command: ["postgres", "-c", "listen_addresses=*"]
+    command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
     mem_limit: 2048m
+    shm_size: 1gb 
     ports:
       - 5432:5432
     volumes:
+      - ./Postgres/postgresql.conf:/etc/postgresql/postgresql.conf
       - ./Postgres:/docker-entrypoint-initdb.d # Инициализация таблиц
       - ./volumes/Database/data:/var/lib/postgresql/data # Папка, где postgres будет хранить данные
       - ./volumes/Database/backups:/backups # Папка для бекапов

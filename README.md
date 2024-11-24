@@ -12,11 +12,11 @@
 7. Можно перейти по адресу `http://localhost:3000`. Зарегистрироваться, разлогиниться, залогиниться, посмотреть профиль.
 8. Репорты связанные с тестировкой нагруженности находятся в папке `Reports`.
 9. Запрос без индекса:
-    ` Gather  (cost=1000.00..22521.61 rows=766 width=90) (actual time=904.236..2454.411 rows=700 loops=1)
+    ``` Gather  (cost=1000.00..22521.61 rows=766 width=90) (actual time=904.236..2454.411 rows=700 loops=1)
        Workers Planned: 2
        Workers Launched: 2
        ->  Parallel Seq Scan on "user"  (cost=0.00..21445.01 rows=319 width=90) (actual time=881.520..2425.928 rows=233 loops=3)
              Filter: (((first_name)::text ~~ 'Ива%'::text) AND ((second_name)::text ~~ 'Т%'::text))
              Rows Removed by Filter: 333100
      Planning Time: 36.957 ms
-     Execution Time: 2454.595 ms`
+     Execution Time: 2454.595 ms```

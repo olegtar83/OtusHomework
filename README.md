@@ -10,7 +10,7 @@
 4. Логинимся с полученным id. Запрос `Login`. Получаем токен авторизации. Копируем его.
 5. Получаем информацию о пользователе. Запрос `Get user by id`. На вкладке `Authorization` выбираем `Type: Bearer Token`, в поле `Token` вставляем скопированный токен с шага 6. В строке с адресом запроса после `http://localhost:7888/user/get/` вставляем нужный id
 7. Можно перейти по адресу `http://localhost:3000`. Зарегистрироваться, разлогиниться, залогиниться, посмотреть профиль.
-8. Репорты связанные с тестировкой нагруженности находятся в папке `Reports`.
+8. Отчеты связанные с тестировкой нагруженности находятся в папке `Reports`.
 9. Запрос без индекса:
     ``` Gather  (cost=1000.00..22521.61 rows=766 width=90) (actual time=904.236..2454.411 rows=700 loops=1)
        Workers Planned: 2
@@ -20,3 +20,12 @@
              Rows Removed by Filter: 333100
      Planning Time: 36.957 ms
      Execution Time: 2454.595 ms```
+10. Создае индекс: ```CREATE INDEX user_first_name_idx ON public."user" using btree (first_name text_pattern_ops,second_name text_pattern_ops) ; ```
+11. Запрос без индекса: ``` Bitmap Heap Scan on "user"  (cost=482.12..2990.74 rows=766 width=90) (actual time=11.157..139.487 rows=700 loops=1)
+   Filter: (((first_name)::text ~~ 'Ива%'::text) AND ((second_name)::text ~~ 'Т%'::text))
+   Heap Blocks: exact=300
+   ->  Bitmap Index Scan on user_first_name_idx  (cost=0.00..481.93 rows=767 width=0) (actual time=10.819..10.819 rows=700 loops=1)
+         Index Cond: (((first_name)::text ~>=~ 'Ива'::text) AND ((first_name)::text ~<~ 'Ивб'::text) AND ((second_name)::text ~>=~ 'Т'::text) AND ((second_name)::text ~<~ 'У'::text))
+ Planning Time: 23.446 ms
+ Execution Time: 141.458 ms```
+

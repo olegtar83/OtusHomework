@@ -8,7 +8,8 @@ services:
       POSTGRES_DB: "legendarydb"
       POSTGRES_USER: "dbuser"
       POSTGRES_PASSWORD: "dbpassword"
-    mem_limit: 512m
+    command: ["postgres", "-c", "listen_addresses=*"]
+    mem_limit: 2048m
     ports:
       - 5432:5432
     volumes:
@@ -29,8 +30,7 @@ services:
       ASPNETCORE_URLS: "http://+:80"
       AllowedHosts: "*" # Ограничивает хосты, которые могут подключаться к API. По умолчанию - все
       # Строка подключения к базе данных Postgres
-      DatabaseSettings:ConnStr: "Host=legendary-db;Port=5432;Username=dbuser;Password=dbpassword;Database=legendarydb;Pooling=true;"
-      # Настройки генерации токена авторизации
+      DatabaseSettings:ConnStr: "Host=legendary-db;Port=5432;Username=dbuser;Password=dbpassword;Database=legendarydb;Pooling=true;Maximum Pool Size=950;Minimum Pool Size=200;Timeout=300;CommandTimeout=300;Connection Idle Lifetime=300;Connection Pruning Interval=10;Keepalive=60;TCP Keepalive Time=60;TCP Keepalive Interval=10"
       JWTSettings:Key: "superSecretKey@34512312312312312"
       JWTSettings:Issuer: legendary.social.network
       JWTSettings:Audience: legendary.social.network

@@ -58,7 +58,7 @@ builder.Services.AddAuthentication(options =>
 
             ValidateIssuer = true,
             ValidateAudience = true,
-            ValidateLifetime = true,
+            ValidateLifetime = false,
             ValidateIssuerSigningKey = true,
             ValidIssuer = config["JWTSettings:Issuer"],
             ValidAudience = config["JWTSettings:Audience"],

@@ -22,16 +22,15 @@
      Execution Time: 2454.595 ms```
 10. Создаем индекс: 
     ```
-     CREATE INDEX user_first_name_idx ON public."user" using btree (first_name text_pattern_ops,second_name text_pattern_ops) ;
+     CREATE INDEX user_full_data_idx ON public."user" using btree (first_name text_pattern_ops,second_name text_pattern_ops) INCLUDE (id, sex, age, city, biography) ;
     ```
 12. Запрос без индекса:
      ```
-     Bitmap Heap Scan on "user"  (cost=482.12..2990.74 rows=766 width=90) (actual time=11.157..139.487 rows=700 loops=1)
+    Index Only Scan using user_full_data_idx on "user"  (cost=0.55..1792.85 rows=684 width=90) (actual time=44.612..81.359 rows=700 loops=1)
+       Index Cond: ((first_name ~>=~ 'Ива'::text) AND (first_name ~<~ 'Ивб'::text) AND (second_name ~>=~ 'Т'::text) AND (second_name ~<~ 'У'::text))
        Filter: (((first_name)::text ~~ 'Ива%'::text) AND ((second_name)::text ~~ 'Т%'::text))
-       Heap Blocks: exact=300
-       ->  Bitmap Index Scan on user_first_name_idx  (cost=0.00..481.93 rows=767 width=0) (actual time=10.819..10.819 rows=700 loops=1)
-             Index Cond: (((first_name)::text ~>=~ 'Ива'::text) AND ((first_name)::text ~<~ 'Ивб'::text) AND ((second_name)::text ~>=~ 'Т'::text) AND ((second_name)::text ~<~ 'У'::text))
-     Planning Time: 23.446 ms
-     Execution Time: 141.458 ms
+       Heap Fetches: 0
+     Planning Time: 1.626 ms
+     Execution Time: 81.467 ms
      ```
 

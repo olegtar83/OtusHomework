@@ -53,4 +53,15 @@ public class UserController : ControllerBase
         var res = _mapper.Map<UserDto>(result.Value);
         return Ok(res);
     }
+
+    [Authorize]
+    [HttpGet("user/search")]
+    public async Task<IActionResult> Search(SearchReq query)
+    {
+        var dbRes = await _db.SearchUserAsync(query.FirstName, query.LastName);
+        if (!dbRes.Succeeded) return BadRequest(new ErrorRes(dbRes.Error));
+
+        var res = _mapper.Map<List<UserDto>>(dbRes.Value);
+        return Ok(res);
+    }
 }

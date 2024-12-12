@@ -50,8 +50,12 @@ CREATE ROLE replicator WITH REPLICATION PASSWORD 'replicator' LOGIN;
 ```
 host    replication     replicator      172.21.0.0/16           trust
 ```
-6) Бекапим мастер
+6) Бекапим мастер (подождать пока сервера прогрузиться)
 ```
+docker exec -it slave1-db /bin/bash
+pg_basebackup -P -R -X stream -c fast -h 172.21.0.2 -U replicator -D /backup
+
+docker exec -it slave2-db /bin/bash
 pg_basebackup -P -R -X stream -c fast -h 172.21.0.2 -U replicator -D /backup
 ```
 7) Останавливаем все реплики и переносим бекап 
@@ -63,10 +67,10 @@ rmdir /s postgres_data_slave1
 rmdir /s postgres_data_slave2
 
 xcopy .\postgres_backup_slave1\* .\postgres_data_slave1\ /E /I /Y
-xcopy .\postgres_backup_slave2\* .\postgres_data_slave1\ /E /I /Y
+xcopy .\postgres_backup_slave2\* .\postgres_data_slave2\ /E /I /Y
 
-docker compose stop slave1-db
-docker compose stop slave2-db
+docker compose start slave1-db
+docker compose start slave2-db
 ```
 8) Смотри в логах реплики появидась следуещея строчка
 ```

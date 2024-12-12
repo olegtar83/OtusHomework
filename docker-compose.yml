@@ -1,25 +1,84 @@
 ﻿version: "3.9"
 
 services:
-  legendary-db:
+  master-db:
     image: postgres:14
-    container_name: legendary-db
+    container_name: master-db
     environment:
       POSTGRES_DB: "legendarydb"
       POSTGRES_USER: "dbuser"
       POSTGRES_PASSWORD: "dbpassword"
-    command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
+    command: [
+      "postgres", 
+      "-c", 
+      "config_file=/etc/postgresql/postgresql.conf",
+      "-c", 
+      "hba_file=/etc/postgresql/pg_hba.conf"
+      ]
     mem_limit: 2048m
     shm_size: 1gb 
     ports:
       - 5432:5432
     volumes:
-      - ./Postgres/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./Postgres/master_postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./Postgres/master_pg_hba.conf:/etc/postgresql/pg_hba.conf
       - ./Postgres:/docker-entrypoint-initdb.d # Инициализация таблиц
-      - ./volumes/Database/data:/var/lib/postgresql/data # Папка, где postgres будет хранить данные
-      - ./volumes/Database/backups:/backups # Папка для бекапов
+      - ./postgres_data_master:/var/lib/postgresql/data
     networks:
-      - legendary-network
+      legendary-network:
+        ipv4_address: 172.21.0.2
+  slave1-db:
+    image: postgres:14
+    container_name: slave1-db
+    environment:
+      POSTGRES_DB: "legendarydb"
+      POSTGRES_USER: "dbuser"
+      POSTGRES_PASSWORD: "dbpassword"
+    command: [
+      "postgres", 
+      "-c", 
+      "config_file=/etc/postgresql/postgresql.conf",
+      "-c", 
+      "hba_file=/etc/postgresql/pg_hba.conf"
+      ]
+    mem_limit: 2048m
+    shm_size: 1gb 
+    ports:
+      - 5433:5432
+    volumes:
+      - ./Postgres/slave1_postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./Postgres/slave1_pg_hba.conf:/etc/postgresql/pg_hba.conf
+      - ./postgres_data_slave1:/var/lib/postgresql/data
+      - ./postgres_backup_slave1:/backup
+    networks:
+      legendary-network:
+        ipv4_address: 172.21.0.3
+  slave2-db:
+    image: postgres:14
+    container_name: slave2-db
+    environment:
+      POSTGRES_DB: "legendarydb"
+      POSTGRES_USER: "dbuser"
+      POSTGRES_PASSWORD: "dbpassword"
+    command: [
+      "postgres", 
+      "-c", 
+      "config_file=/etc/postgresql/postgresql.conf",
+      "-c", 
+      "hba_file=/etc/postgresql/pg_hba.conf"
+      ]
+    mem_limit: 2048m
+    shm_size: 1gb 
+    ports:
+      - 5434:5432
+    volumes:
+      - ./Postgres/slave2_postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./Postgres/slave2_pg_hba.conf:/etc/postgresql/pg_hba.conf
+      - ./postgres_data_slave2:/var/lib/postgresql/data
+      - ./postgres_backup_slave2:/backup
+    networks:
+      legendary-network:
+        ipv4_address: 172.21.0.4
   legendary-api:
     image: legendary-api-image
     build:
@@ -32,7 +91,9 @@ services:
       ASPNETCORE_URLS: "http://+:80"
       AllowedHosts: "*" # Ограничивает хосты, которые могут подключаться к API. По умолчанию - все
       # Строка подключения к базе данных Postgres
-      DatabaseSettings:ConnStr: "Host=legendary-db;Port=5432;Username=dbuser;Password=dbpassword;Database=legendarydb;Pooling=true;Maximum Pool Size=950;Minimum Pool Size=200;Timeout=300;CommandTimeout=300;Connection Idle Lifetime=300;Connection Pruning Interval=10;Keepalive=60;TCP Keepalive Time=60;TCP Keepalive Interval=10"
+      DatabaseSettings:MasterConnStr: "Host=master-db;Port=5432;Username=dbuser;Password=dbpassword;Database=legendarydb;Pooling=true;Maximum Pool Size=950;Minimum Pool Size=200;Timeout=300;CommandTimeout=300;Connection Idle Lifetime=300;Connection Pruning Interval=10;Keepalive=60;TCP Keepalive Time=60;TCP Keepalive Interval=10"
+      DatabaseSettings:ReplicaConnStr1: "Host=slave1-db;Port=5432;Username=dbuser;Password=dbpassword;Database=legendarydb;Pooling=true;Maximum Pool Size=950;Minimum Pool Size=200;Timeout=300;CommandTimeout=300;Connection Idle Lifetime=300;Connection Pruning Interval=10;Keepalive=60;TCP Keepalive Time=60;TCP Keepalive Interval=10"
+      DatabaseSettings:ReplicaConnStr2: "Host=slave2-db;Port=5432;Username=dbuser;Password=dbpassword;Database=legendarydb;Pooling=true;Maximum Pool Size=950;Minimum Pool Size=200;Timeout=300;CommandTimeout=300;Connection Idle Lifetime=300;Connection Pruning Interval=10;Keepalive=60;TCP Keepalive Time=60;TCP Keepalive Interval=10"
       JWTSettings:Key: "superSecretKey@34512312312312312"
       JWTSettings:Issuer: legendary.social.network
       JWTSettings:Audience: legendary.social.network
@@ -42,19 +103,25 @@ services:
     mem_limit: 1024m
     entrypoint: dotnet LegendarySocialNetwork.dll
     depends_on:
-      - legendary-db
+      - master-db
+      - slave1-db
+      - slave2-db 
     networks:
       - legendary-network
-  legendary-react-app:
-    build:
-      context: ./legendary-client  # Update this to the path where your React app is located
-      dockerfile: Dockerfile  # Make sure you have a Dockerfile in this directory for your React app
-    container_name: legendary-react-app
-    ports:
-      - 3000:80  # Map port 3000 on the host to port 80 in the container
-    networks:
-      - legendary-network    
+  # legendary-react-app:
+  #   build:
+  #     context: ./legendary-client  # Update this to the path where your React app is located
+  #     dockerfile: Dockerfile  # Make sure you have a Dockerfile in this directory for your React app
+  #   container_name: legendary-react-app
+  #   ports:
+  #     - 3000:80  # Map port 3000 on the host to port 80 in the container
+  #   networks:
+  #     - legendary-network    
 networks:
   legendary-network:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
+          gateway: 172.21.0.1
 

@@ -3,7 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33312.197
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LegendarySocialNetwork", "LegendarySocialNetwork\LegendarySocialNetwork.csproj", "{81ED4A58-F065-4A03-85D1-51D337C3D967}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LegendarySocialNetwork", "LegendarySocialNetwork\LegendarySocialNetwork.csproj", "{81ED4A58-F065-4A03-85D1-51D337C3D967}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EE56E72B-F61C-491E-8662-A4AB6E9E30D5}"
+	ProjectSection(SolutionItems) = preProject
+		..\docker-compose.yml = ..\docker-compose.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Proofs", "Proofs", "{D50A6C81-881B-4729-804B-B5792FEAC4DC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReplicationProof", "ReplicationProof\ReplicationProof.csproj", "{1040F5BB-ED76-4FFA-A44C-E384D1675168}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +24,16 @@ Global
 		{81ED4A58-F065-4A03-85D1-51D337C3D967}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81ED4A58-F065-4A03-85D1-51D337C3D967}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81ED4A58-F065-4A03-85D1-51D337C3D967}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1040F5BB-ED76-4FFA-A44C-E384D1675168}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1040F5BB-ED76-4FFA-A44C-E384D1675168}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1040F5BB-ED76-4FFA-A44C-E384D1675168}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1040F5BB-ED76-4FFA-A44C-E384D1675168}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1040F5BB-ED76-4FFA-A44C-E384D1675168} = {D50A6C81-881B-4729-804B-B5792FEAC4DC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0848C717-E3C1-4760-B3CC-59EEAA990352}

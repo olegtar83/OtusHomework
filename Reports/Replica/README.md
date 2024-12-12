@@ -1,10 +1,10 @@
 # Полусинхронная репликация
 1) Создаем мастер со следующеми настройками
 ```listen_addresses = 'localhost,172.21.0.2'
-max_connections = 100			# (change requires restart)
+max_connections = 100
 ssl = off
-shared_buffers = 1GB			# min 128kB
-dynamic_shared_memory_type = posix	# the default is usually the first option
+shared_buffers = 1GB
+dynamic_shared_memory_type = posix
 max_wal_size = 1GB
 min_wal_size = 80MB
 
@@ -17,29 +17,29 @@ max_wal_senders = 8
 2) Создаем первую реплику
 ```
 listen_addresses = 'localhost,172.21.0.3'
-max_connections = 500			# (change requires restart)
+max_connections = 500
 ssl = off
-shared_buffers = 1GB			# min 128kB
-dynamic_shared_memory_type = posix	# the default is usually the first option
+shared_buffers = 1GB
+dynamic_shared_memory_type = posix
 max_wal_size = 1GB
 min_wal_size = 80MB
 
-wal_level = replica			# minimal, replica, or logical
-max_wal_senders = 8		# max number of walsender processes
+wal_level = replica
+max_wal_senders = 8
 primary_conninfo = 'host=master-db port=5432 user=replicator password=pass application_name=slave1-db'
 ```
 3) Создаем вторую реплику
 ```
 listen_addresses = 'localhost,172.21.0.4'
-max_connections = 500			# (change requires restart)
+max_connections = 500
 ssl = off
-shared_buffers = 1GB			# min 128kB
-dynamic_shared_memory_type = posix	# the default is usually the first option
+shared_buffers = 1GB
+dynamic_shared_memory_type = posix
 max_wal_size = 1GB
 min_wal_size = 80MB
 
-wal_level = replica			# minimal, replica, or logical
-max_wal_senders = 8		# max number of walsender processes
+wal_level = replica
+max_wal_senders = 8
 primary_conninfo = 'host=master-db port=5432 user=replicator password=pass application_name=slave2-db'
 ```
 4) Добавляем юзер для репликации в дамп на мастере

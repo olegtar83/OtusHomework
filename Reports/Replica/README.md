@@ -69,8 +69,8 @@ rmdir /s postgres_data_slave2
 xcopy .\postgres_backup_slave1\* .\postgres_data_slave1\ /E /I /Y
 xcopy .\postgres_backup_slave2\* .\postgres_data_slave1\ /E /I /Y
 
-docker compose stop slave1-db
-docker compose stop slave2-db
+docker compose start slave1-db
+docker compose start slave2-db
 ```
 8) Смотри в логах реплики появидась следуещея строчка
 ```

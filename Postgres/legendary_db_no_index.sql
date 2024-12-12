@@ -22,7 +22,7 @@ SET row_security = off;
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 
-CREATE ROLE replicator WITH REPLICATION PASSWORD 'replicator' LOGIN;
+CREATE ROLE replicator WITH REPLICATION PASSWORD 'pass' LOGIN;
 --
 -- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: 
 --

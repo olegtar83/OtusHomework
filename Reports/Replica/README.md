@@ -1,6 +1,7 @@
 # Полусинхронная репликация
 1) Создаем мастер со следующеми настройками
-```listen_addresses = 'localhost,172.21.0.2'
+```
+listen_addresses = 'localhost,172.21.0.2'
 max_connections = 100
 ssl = off
 shared_buffers = 1GB

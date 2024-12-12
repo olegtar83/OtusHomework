@@ -26,7 +26,7 @@ min_wal_size = 80MB
 
 wal_level = replica
 max_wal_senders = 8
-primary_conninfo = 'host=master-db port=5432 user=replicator password=pass application_name=slave1-db'
+primary_conninfo = 'host=master-db port=5432 user=replicator password=replicator application_name=slave1-db'
 ```
 3) Создаем вторую реплику
 ```
@@ -40,7 +40,7 @@ min_wal_size = 80MB
 
 wal_level = replica
 max_wal_senders = 8
-primary_conninfo = 'host=master-db port=5432 user=replicator password=pass application_name=slave2-db'
+primary_conninfo = 'host=master-db port=5432 user=replicator password=replicator application_name=slave2-db'
 ```
 4) Добавляем юзер для репликации в дамп на мастере
 ```

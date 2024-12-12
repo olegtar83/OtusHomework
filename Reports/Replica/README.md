@@ -1,44 +1,102 @@
-# LegendarySocialNetwork. Инструкция по запуску
+# Полусинхронная репликация
+1) Создаем мастер со следующеми настройками
+```listen_addresses = 'localhost,172.21.0.2'
+max_connections = 100			# (change requires restart)
+ssl = off
+shared_buffers = 1GB			# min 128kB
+dynamic_shared_memory_type = posix	# the default is usually the first option
+max_wal_size = 1GB
+min_wal_size = 80MB
 
-Запрос для создания таблиц лежит в папке `Postgres`.
-Коллекция вызовов для Postman лежит в папке `Postman`.
+wal_level = replica
+synchronous_commit = on
+synchronous_standby_names = 'FIRST 1 (slave1-db, slave2-db)'
 
-0. Все состояние базы данных хранится в папке `volumes`. Для того, чтобы запустить с нуля и заново создать базу данных нужно удалить папку `rm -rf volumes`.
-1. Запускаем базу данных и API командой `docker-compose up -d`.
-2. Ждем когда Postgres запустится, перезагрузится, создадутся таблицы.
-3. Открываем `http://localhost:7888/swagger`, создаем нового пользователя `qwerty` с паролем `qwerty`. Запрос `Register`. Получаем id пользователя. (В тестовой базе пользователь уже создан)
-4. Логинимся с полученным id. Запрос `Login`. Получаем токен авторизации. Копируем его.
-5. Получаем информацию о пользователе. Запрос `Get user by id`. На вкладке `Authorization` выбираем `Type: Bearer Token`, в поле `Token` вставляем скопированный токен с шага 6. В строке с адресом запроса после `http://localhost:7888/user/get/` вставляем нужный id
-7. Можно перейти по адресу `http://localhost:3000`. Зарегистрироваться, разлогиниться, залогиниться, посмотреть профиль.
-8. Отчеты связанные с тестировкой нагруженности находятся в папке `Reports`.
-9. Проверочный запрос 
-    ```
-    EXPLAIN ANALYSE
-    SELECT id, first_name, second_name, sex, age, city, biography
-    FROM public."user"
-    WHERE first_name LIKE 'Ива%' AND second_name LIKE 'Т%'
-    ```
-10. Запрос без индекса:
-    ``` Gather  (cost=1000.00..22521.61 rows=766 width=90) (actual time=904.236..2454.411 rows=700 loops=1)
-       Workers Planned: 2
-       Workers Launched: 2
-       ->  Parallel Seq Scan on "user"  (cost=0.00..21445.01 rows=319 width=90) (actual time=881.520..2425.928 rows=233 loops=3)
-             Filter: (((first_name)::text ~~ 'Ива%'::text) AND ((second_name)::text ~~ 'Т%'::text))
-             Rows Removed by Filter: 333100
-     Planning Time: 36.957 ms
-     Execution Time: 2454.595 ms```
-11. Создаем индекс: 
-    ```
-     CREATE INDEX user_full_data_idx ON public."user" using btree (first_name text_pattern_ops,second_name text_pattern_ops) INCLUDE (id, sex, age, city, biography) ;
-    ```
-12. Запрос с индексом:
-     ```
-    Index Only Scan using user_full_data_idx on "user"  (cost=0.55..1792.85 rows=684 width=90) (actual time=44.612..81.359 rows=700 loops=1)
-       Index Cond: ((first_name ~>=~ 'Ива'::text) AND (first_name ~<~ 'Ивб'::text) AND (second_name ~>=~ 'Т'::text) AND (second_name ~<~ 'У'::text))
-       Filter: (((first_name)::text ~~ 'Ива%'::text) AND ((second_name)::text ~~ 'Т%'::text))
-       Heap Fetches: 0
-     Planning Time: 1.626 ms
-     Execution Time: 81.467 ms
-     ```
- 13. Покрывающий индекс лучше обычного, потому что когда мы выполняем запрос, который ищет по first_name и last_name, PostgreSQL может извлечь нужные поля сразу из индекса        без необходимости дополнительного доступа к таблице.    
+max_wal_senders = 8
+```
+2) Создаем первую реплику
+```
+listen_addresses = 'localhost,172.21.0.3'
+max_connections = 500			# (change requires restart)
+ssl = off
+shared_buffers = 1GB			# min 128kB
+dynamic_shared_memory_type = posix	# the default is usually the first option
+max_wal_size = 1GB
+min_wal_size = 80MB
 
+wal_level = replica			# minimal, replica, or logical
+max_wal_senders = 8		# max number of walsender processes
+primary_conninfo = 'host=master-db port=5432 user=replicator password=pass application_name=slave1-db'
+```
+3) Создаем вторую реплику
+```
+listen_addresses = 'localhost,172.21.0.4'
+max_connections = 500			# (change requires restart)
+ssl = off
+shared_buffers = 1GB			# min 128kB
+dynamic_shared_memory_type = posix	# the default is usually the first option
+max_wal_size = 1GB
+min_wal_size = 80MB
+
+wal_level = replica			# minimal, replica, or logical
+max_wal_senders = 8		# max number of walsender processes
+primary_conninfo = 'host=master-db port=5432 user=replicator password=pass application_name=slave2-db'
+```
+4) Добавляем юзер для репликации в дамп на мастере
+```
+CREATE ROLE replicator WITH REPLICATION PASSWORD 'replicator' LOGIN;
+```   
+5) Во всех файлах `pga_hba.conf` добавляем
+```
+host    replication     replicator      172.21.0.0/16           trust
+```
+6) Бекапим мастер
+```
+pg_basebackup -P -R -X stream -c fast -h 172.21.0.2 -U replicator -D /backup
+```
+7) Останавливаем все реплики и переносим бекап 
+```
+docker compose stop slave1-db
+docker compose stop slave2-db
+
+rmdir /s postgres_data_slave1
+rmdir /s postgres_data_slave2
+
+xcopy .\postgres_backup_slave1\* .\postgres_data_slave1\ /E /I /Y
+xcopy .\postgres_backup_slave2\* .\postgres_data_slave1\ /E /I /Y
+
+docker compose stop slave1-db
+docker compose stop slave2-db
+```
+8) Смотри в логах реплики появидась следуещея строчка
+```
+started streaming WAL from primary at 0/10000000 on timeline 1
+```
+9) Делаем соответсвующие изменения в коде и делаем нагрузочное тестирование на ' /user/search', результаты:
+![master](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Replica/master.png)
+![slave1](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Replica/slave1.png)
+![slave2](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Replica/slave2.png)
+10) Видим что на репликах вырос запрос на CPU и Memory, в то время как на мастере он не меняется.
+11) Далее делаем нагрузочное тестирование на мастер и убиваем его
+```
+docker exec -it master-db psql -U dbuser -d legendarydb
+CREATE TABLE test_table (id INT, name TEXT);
+INSERT INTO test_table (id, name) SELECT generate_series(1, 1000), 'test';
+
+docker-compose stop master-db
+```
+12) Промотим реплику до мастера
+```
+docker exec -it slave1-db psql -U dbuser -d legendarydb
+
+select * from pg_promote();
+```
+ Меняем конфигурацию в файле `slave1_postgresql.conf`
+```
+synchronous_commit = on
+synchronous_standby_names = 'FIRST 1 (master-db, slave2-db)'
+```
+
+ Перезапускаем `select * from pg_reload_conf();`
+
+13) При повторной проверке выяснилось что все транзакции сохранились без потерь.

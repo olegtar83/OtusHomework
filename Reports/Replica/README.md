@@ -44,7 +44,7 @@ primary_conninfo = 'host=master-db port=5432 user=replicator password=pass appli
 ```
 4) Добавляем юзер для репликации в дамп на мастере
 ```
-CREATE ROLE replicator WITH REPLICATION PASSWORD 'pass' LOGIN;
+CREATE ROLE replicator WITH REPLICATION PASSWORD 'replicator' LOGIN;
 ```   
 5) Во всех файлах `pga_hba.conf` добавляем
 ```

@@ -52,7 +52,7 @@ host    replication     replicator      172.21.0.0/16           trust
 ```
 6) Бекапим мастер
 ```
-docker exec -it master-db psql -U dbuser -d legendarydb
+docker exec -it master-db /bin/bash
 pg_basebackup -P -R -X stream -c fast -h 172.21.0.2 -U replicator -D /backup
 ```
 7) Останавливаем все реплики и переносим бекап 

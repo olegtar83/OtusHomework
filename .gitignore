@@ -363,3 +363,8 @@ MigrationBackup/
 FodyWeavers.xsd
 
 volumes
+postgres_backup_slave1
+postgres_backup_slave2
+postgres_data_master
+postgres_data_slave1
+postgres_data_slave2

@@ -12,19 +12,31 @@ public class DatabaseContext : IDatabaseContext, IDisposable
     {
         var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
         NpgsqlLoggingConfiguration.InitializeLogging(loggerFactory);
-        var connStr = settings.Value.ConnStr;
-        db = NpgsqlDataSource.Create(connStr);
+        if (settings.Value.ReplicaConnStrings.Any())
+        {
+            var readConnStr = settings.Value.ReplicaConnStrings[new Random().Next(settings.Value.ReplicaConnStrings.Count)];
+            _readDb = NpgsqlDataSource.Create(readConnStr);
+            _writeDb = NpgsqlDataSource.Create(settings.Value.MasterConnStr);
+        }
+        else
+        {
+            _readDb = NpgsqlDataSource.Create(settings.Value.MasterConnStr);
+            _writeDb = NpgsqlDataSource.Create(settings.Value.MasterConnStr);
+        }
     }
-    private readonly NpgsqlDataSource db;
+    private readonly NpgsqlDataSource _readDb;
+    private readonly NpgsqlDataSource _writeDb;
     public async void Dispose()
     {
-        await db.DisposeAsync();
+        await _readDb.DisposeAsync();
+        await _writeDb.DisposeAsync();
+
         GC.SuppressFinalize(this);
     }
 
     public async Task<Result<AccountEntity>> GetLoginAsync(string id)
     {
-        await using var con = await db.OpenConnectionAsync();
+        await using var con = await _readDb.OpenConnectionAsync();
         var sql = "SELECT id, \"password\" FROM public.account WHERE id = @id LIMIT 1;";
         var item = await con.QueryFirstOrDefaultAsync<AccountEntity>(sql, new { id });
         if (item is not null) { return Result<AccountEntity>.Success(item); }
@@ -33,7 +45,7 @@ public class DatabaseContext : IDatabaseContext, IDisposable
 
     public async Task<Result<string>> RegisterAsync(UserEntity user, string password)
     {
-        await using var con = await db.OpenConnectionAsync();
+        await using var con = await _writeDb.OpenConnectionAsync();
    
         await using var cmdAccount = new NpgsqlCommand("INSERT INTO public.account\r\n(id, \"password\")\r\nVALUES(@id, @password);\r\n", con)
         {
@@ -65,7 +77,7 @@ public class DatabaseContext : IDatabaseContext, IDisposable
 
     public async Task<Result<UserEntity>> GetUserAsync(string id)
     {
-        await using var con = await db.OpenConnectionAsync();
+        await using var con = await _readDb.OpenConnectionAsync();
 
         var sql = "SELECT id, first_name, second_name, sex, age, city, biography\r\nFROM public.\"user\"\r\n WHERE id = @id LIMIT 1;";
         var item = await con.QueryFirstOrDefaultAsync<UserEntity>(sql, new { id });
@@ -75,7 +87,7 @@ public class DatabaseContext : IDatabaseContext, IDisposable
 
     public async Task<Result<List<UserEntity>>> SearchUserAsync(string firstName, string lastName)
     {
-        await using var con = await db.OpenConnectionAsync();
+        await using var con = await _readDb.OpenConnectionAsync();
         var sql = "SELECT id, first_name, second_name, sex, age, city, biography\r\nFROM public.\"user\"\r\n";
         var sqlConditions = new List<string>();
         IEnumerable<UserEntity> items;

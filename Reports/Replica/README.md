@@ -50,7 +50,7 @@ CREATE ROLE replicator WITH REPLICATION PASSWORD 'pass' LOGIN;
 ```
 host    replication     replicator      172.21.0.0/16           trust
 ```
-6) Бекапим мастер (подождать пока сервера прогрузится)
+6) Бекапим мастер (подождать пока сервера прогрузиться)
 ```
 docker exec -it slave1-db /bin/bash
 pg_basebackup -P -R -X stream -c fast -h 172.21.0.2 -U replicator -D /backup

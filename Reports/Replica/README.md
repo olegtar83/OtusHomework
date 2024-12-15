@@ -73,7 +73,7 @@ xcopy .\postgres_backup_slave2\* .\postgres_data_slave2\ /E /I /Y
 docker compose start slave1-db
 docker compose start slave2-db
 ```
-8) Смотри в логах реплики появидась следуещея строчка
+8) Смотрим в логах реплики, должна появитсь следующея строчка
 ```
 started streaming WAL from primary at 0/10000000 on timeline 1
 ```

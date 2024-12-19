@@ -28,12 +28,12 @@ namespace LegendarySocialNetwork.Application.Features.Friendship
 
             foreach (var participantId in new[] { _currentUserService.GetUserId, request.userId })
             {
-                await _publisher.Publish(new UpdateFeedEventRequested(
-               new Domain.Messages.UpdateFeedMessage
-               {
-                   Operation = Domain.Messages.Operation.Reset,
-                   UserId = participantId
-               }));
+                var message = new Domain.Messages.UpdateFeedMessage
+                {
+                    Operation = Domain.Messages.Operation.Reset,
+                    UserId = participantId
+                };
+                await _publisher.Publish(new UpdateFeedEventRequested(message));
             }
             return Result<Unit>.Success(Unit.Value);
         }

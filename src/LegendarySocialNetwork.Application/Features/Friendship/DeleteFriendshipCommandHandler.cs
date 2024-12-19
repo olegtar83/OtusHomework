@@ -25,7 +25,7 @@ namespace LegendarySocialNetwork.Application.Features.Friendship
         {
             await _friendshipRepository.DeleteAsync(_currentUserService.GetUserId, request.UserId);
 
-            foreach (var participantId in new []{ _currentUserService.GetUserId, request.UserId})
+            foreach (var participantId in new[] { _currentUserService.GetUserId, request.UserId })
             {
                 var message = new Domain.Messages.UpdateFeedMessage
                 {

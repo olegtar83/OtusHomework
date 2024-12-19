@@ -45,7 +45,8 @@ namespace LegendarySocialNetwork.Application.Features.Post.Posts
             {
                 Operation = Domain.Messages.Operation.Delete,
                 Post = postMessage,
-                FriendsIds = friendshipsResult.Value.Select(x => x.Addressed_id)
+                FriendsIds = friendshipsResult.Value.Select(x => x.Requester_id == userId
+                            ? x.Addressed_id : x.Requester_id),
             };
 
             await _publisher.Publish(new UpdateFeedEventRequested(updateFeedMessage));

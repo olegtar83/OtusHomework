@@ -4,10 +4,8 @@ using LegendarySocialNetwork.Application.Common.Models;
 using LegendarySocialNetwork.Domain.Entities;
 using LegendarySocialNetwork.Infrastructure.Common.Options;
 using MediatR;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Options;
 using Npgsql;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace LegendarySocialNetwork.Infrastructure.Repositories
 {

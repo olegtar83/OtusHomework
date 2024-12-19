@@ -3,16 +3,10 @@ using LegendarySocialNetwork.Application.Common.Models;
 using LegendarySocialNetwork.Domain.Entities;
 using LegendarySocialNetwork.Infrastructure.Repositories;
 using MediatR;
-using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LegendarySocialNetwork.Application.Features.Friendship
 {
-    public record GetFriendsCommandRequest: IRequest<Result<List<FriendEntity>>>;
+    public record GetFriendsCommandRequest : IRequest<Result<List<FriendEntity>>>;
     public class GetFriendsCommandHandler : IRequestHandler<GetFriendsCommandRequest, Result<List<FriendEntity>>>
     {
         private readonly ICurrentUserService _currentUserService;

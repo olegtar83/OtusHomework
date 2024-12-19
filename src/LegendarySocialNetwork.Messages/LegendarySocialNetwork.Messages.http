@@ -1,0 +1,6 @@
+@LegendarySocialNetwork.Messages_HostAddress = http://localhost:5080
+
+GET {{LegendarySocialNetwork.Messages_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

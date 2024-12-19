@@ -18,6 +18,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LegendarySocialNetwork.WebA
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LegendarySocialNetwork.Application", "LegendarySocialNetwork.Application\LegendarySocialNetwork.Application.csproj", "{EE3EABAF-97DA-4071-9BE4-300324350BF2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LegendarySocialNetwork.Messages", "LegendarySocialNetwork.Messages\LegendarySocialNetwork.Messages.csproj", "{4DAA7D89-0336-4C38-9FD8-C83C67017C2F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,6 +42,10 @@ Global
 		{EE3EABAF-97DA-4071-9BE4-300324350BF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EE3EABAF-97DA-4071-9BE4-300324350BF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EE3EABAF-97DA-4071-9BE4-300324350BF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DAA7D89-0336-4C38-9FD8-C83C67017C2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DAA7D89-0336-4C38-9FD8-C83C67017C2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DAA7D89-0336-4C38-9FD8-C83C67017C2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DAA7D89-0336-4C38-9FD8-C83C67017C2F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

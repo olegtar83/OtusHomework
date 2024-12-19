@@ -26,28 +26,32 @@ namespace LegendarySocialNetwork.Application.Features.Post.Posts
         }
         public async Task<Result<Unit>> Handle(UpdatePostCommandRequest request, CancellationToken cancellationToken)
         {
-            await _postRepository
-               .UpdateAsync(
-               request.Text,
-               request.PostId,
-               _currentUserService.GetUserId);
+            var userId = _currentUserService.GetUserId;
 
-            var friendships = await _friendshipRepository.GetAsync(_currentUserService.GetUserId);
+            await _postRepository.UpdateAsync(request.Text, request.PostId, userId);
 
-            await _publisher.Publish(new UpdateFeedEventRequested(
-                new Domain.Messages.UpdateFeedMessage
-                {
-                    Operation = Domain.Messages.Operation.Update,
-                    Post = new Domain.Messages.PostMessage
-                    {
-                        Id = request.PostId,
-                        Text = request.Text,
-                        UserId = _currentUserService.GetUserId,
-                        Created = DateTime.UtcNow
-                    },
-                    FriendsIds = friendships.Value.Select(x => x.Addressed_id)
-                }
-            ));
+            var friendshipsResult = await _friendshipRepository.GetAsync(userId);
+
+            if (!friendshipsResult.Value.Any())
+                return Result<Unit>.Success(Unit.Value);
+
+            var postMessage = new Domain.Messages.PostMessage
+            {
+                Id = request.PostId,
+                Text = request.Text,
+                UserId = userId,
+                Created = DateTime.UtcNow
+            };
+
+            var updateFeedMessage = new Domain.Messages.UpdateFeedMessage
+            {
+                Operation = Domain.Messages.Operation.Update,
+                Post = postMessage,
+                FriendsIds = friendshipsResult.Value.Select(x => x.Addressed_id)
+            };
+
+            await _publisher.Publish(new UpdateFeedEventRequested(updateFeedMessage));
+
             return Result<Unit>.Success(Unit.Value);
         }
     }

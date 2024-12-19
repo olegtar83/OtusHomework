@@ -23,17 +23,16 @@ namespace LegendarySocialNetwork.Application.Features.Friendship
         }
         public async Task<Result<Unit>> Handle(DeleteFriendshipCommandRequest request, CancellationToken cancellationToken)
         {
-
             await _friendshipRepository.DeleteAsync(_currentUserService.GetUserId, request.UserId);
 
             foreach (var participantId in new []{ _currentUserService.GetUserId, request.UserId})
             {
-                await _publisher.Publish(new UpdateFeedEventRequested(
-               new Domain.Messages.UpdateFeedMessage
-               {
-                   Operation = Domain.Messages.Operation.Reset,
-                   UserId = participantId
-               }));
+                var message = new Domain.Messages.UpdateFeedMessage
+                {
+                    Operation = Domain.Messages.Operation.Reset,
+                    UserId = participantId
+                };
+                await _publisher.Publish(new UpdateFeedEventRequested(message));
             }
             return Result<Unit>.Success(Unit.Value);
         }

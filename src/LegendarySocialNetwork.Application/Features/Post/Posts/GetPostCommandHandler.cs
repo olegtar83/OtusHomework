@@ -13,9 +13,9 @@ namespace LegendarySocialNetwork.Application.Features.Post.Posts
         {
             _postRepository = postRepository;
         }
-        public async Task<Result<PostEntity>> Handle(GetPostCommandRequest request, CancellationToken cancellationToken)
+        public Task<Result<PostEntity>> Handle(GetPostCommandRequest request, CancellationToken cancellationToken)
         {
-            return await _postRepository.GetAsync(request.PostId);
+            return _postRepository.GetAsync(request.PostId);
         }
     }
 }

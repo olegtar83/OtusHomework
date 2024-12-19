@@ -28,21 +28,28 @@ namespace LegendarySocialNetwork.Application.Features.Post.Posts
         {
             await _postRepository.DeleteAsync(request.PostId);
 
-            var friendships = await _friendshipRepository.GetAsync(_currentUserService.GetUserId);
+            var userId = _currentUserService.GetUserId;
+            var friendshipsResult = await _friendshipRepository.GetAsync(userId);
 
-            await _publisher.Publish(new UpdateFeedEventRequested(
-                new Domain.Messages.UpdateFeedMessage
-                {
-                    Operation = Domain.Messages.Operation.Delete,
-                    Post = new Domain.Messages.PostMessage
-                    {
-                        Id = request.PostId,
-                        Text = string.Empty,
-                        UserId = _currentUserService.GetUserId
-                    },
-                    FriendsIds = friendships.Value.Select(x => x.Addressed_id)
-                }
-                ));
+            if (!friendshipsResult.Value.Any())
+                return Result<Unit>.Success(Unit.Value);
+
+            var postMessage = new Domain.Messages.PostMessage
+            {
+                Id = request.PostId,
+                Text = string.Empty,
+                UserId = userId
+            };
+
+            var updateFeedMessage = new Domain.Messages.UpdateFeedMessage
+            {
+                Operation = Domain.Messages.Operation.Delete,
+                Post = postMessage,
+                FriendsIds = friendshipsResult.Value.Select(x => x.Addressed_id)
+            };
+
+            await _publisher.Publish(new UpdateFeedEventRequested(updateFeedMessage));
+
             return Result<Unit>.Success(Unit.Value);
         }
     }

@@ -24,7 +24,7 @@
     ]
    ```
   8. Создаем пост `http://localhost:7888/api/Post/Create`.
-  9. Смотрим в redis cli на наличие ключей для фида у друзей в формате feed-{userId}.
+  9. Смотрим в redis cli на наличие ключей с постом у друзей в формате feed-{userId}.
   ![redis1](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Cache/redis-keys.png)     
   10. Убераем юзера из друзей `http://localhost:7888/api/Friends/Delete/ff55dd6a-487e-4c9b-a042-2571193e2b37`.
   11. Cмотрим на ключи в редисе, остается один ключ.

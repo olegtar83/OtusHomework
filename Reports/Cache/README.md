@@ -25,55 +25,60 @@
    ```
   8. Создаем пост `http://localhost:7888/api/Post/Create`.
   9. Смотрим в redis cli на наличие ключей в формате feed-{userId}.
-10. Убераем юзера из друзей `http://localhost:7888/api/Friends/Delete/ff55dd6a-487e-4c9b-a042-2571193e2b37`.
-11. Cмотрим на ключи в редисе, остается один ключ.
-12. Добавляем еще один пост, и проверяем фид у оставшегося друга `http://localhost:7888/api/Post/Feed/67226925-f615-48c2-8fe6-a0f47e9f385f`, фид будет браться из кеша поcкольку ключ `feed-67226925-f615-48c2-8fe6-a0f47e9f385f` существует в редисе, получаем коллекцию ключей из редиса.
-```
-[
-  {
-    "id": "e38334c7-85fc-4873-86a8-a0fe0f5e473e",
-    "text": "string",
-    "userId": "be732198-0f1a-43c8-b2dc-035fac7d6683",
-    "created": "2024-12-19T09:27:21.7906913Z"
-  },
-  {
-    "id": "76c3b784-d220-40f6-898b-59707392752a",
-    "text": "ориоио",
-    "userId": "be732198-0f1a-43c8-b2dc-035fac7d6683",
-    "created": "2024-12-19T10:20:18.9522163Z"
-  }
-```
-13. Обновляем один из постов `http://localhost:7888/api/Post/Update`.
-14. Повторно смотри фид друга `http://localhost:7888/api/Post/Feed/67226925-f615-48c2-8fe6-a0f47e9f385f`.
-```[
-  {
-    "id": "e38334c7-85fc-4873-86a8-a0fe0f5e473e",
-    "text": "string",
-    "userId": "be732198-0f1a-43c8-b2dc-035fac7d6683",
-    "created": "2024-12-19T09:27:21.7906913Z"
-  },
-  {
-    "id": "76c3b784-d220-40f6-898b-59707392752a",
-    "text": "this post was updated",
-    "userId": "be732198-0f1a-43c8-b2dc-035fac7d6683",
-    "created": "2024-12-19T10:20:18.9522163Z"
-  }
-]
-```
-15. Удаляем один из постов `http://localhost:7888/api/Post/Delete/76c3b784-d220-40f6-898b-59707392752a`, смотрим фид друга
-`http://localhost:7888/api/Post/Feed/67226925-f615-48c2-8fe6-a0f47e9f385f`, остался один пост.
-```
-[
-  {
-    "id": "e38334c7-85fc-4873-86a8-a0fe0f5e473e",
-    "text": "string",
-    "userId": "be732198-0f1a-43c8-b2dc-035fac7d6683",
-    "created": "2024-12-19T09:27:21.7906913Z"
-  }
-]
-```
-16. Инвалидация кеша  в случае обновление друзей, модификации, добавлении и удалении постов работает корректно после события в брокере сообщений.
-17. Также можно посмореть на происходящее в кафке ui:
-```
-http://localhost:8080/ui/clusters/local/all-topics/update-feed-posts/messages?keySerde=String&valueSerde=String&limit=100
-```
+  ![redis1](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Cache/redis-keys.png)     
+  10. Убераем юзера из друзей `http://localhost:7888/api/Friends/Delete/ff55dd6a-487e-4c9b-a042-2571193e2b37`.
+  11. Cмотрим на ключи в редисе, остается один ключ.
+  ![redis2](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Cache/delete-friand-redis.png)     
+  12. Добавляем еще один пост, и проверяем фид у оставшегося друга `http://localhost:7888/api/Post/Feed/67226925-f615-48c2- 
+  8fe6-a0f47e9f385f`, фид будет браться из кеша поcкольку ключ `feed-67226925-f615-48c2-8fe6-a0f47e9f385f` существует в 
+  редисе, получаем коллекцию ключей из редиса.
+  ```
+  [
+    {
+      "id": "e38334c7-85fc-4873-86a8-a0fe0f5e473e",
+      "text": "string",
+      "userId": "be732198-0f1a-43c8-b2dc-035fac7d6683",
+      "created": "2024-12-19T09:27:21.7906913Z"
+    },
+    {
+      "id": "76c3b784-d220-40f6-898b-59707392752a",
+      "text": "ориоио",
+      "userId": "be732198-0f1a-43c8-b2dc-035fac7d6683",
+      "created": "2024-12-19T10:20:18.9522163Z"
+    }
+  ```
+  13. Обновляем один из постов `http://localhost:7888/api/Post/Update`.
+  14. Повторно смотри фид друга `http://localhost:7888/api/Post/Feed/67226925-f615-48c2-8fe6-a0f47e9f385f`.
+  ```[
+     {
+      "id": "e38334c7-85fc-4873-86a8-a0fe0f5e473e",
+      "text": "string",
+      "userId": "be732198-0f1a-43c8-b2dc-035fac7d6683",
+     "created": "2024-12-19T09:27:21.7906913Z"
+    },
+    {
+      "id": "76c3b784-d220-40f6-898b-59707392752a",
+      "text": "this post was updated",
+      "userId": "be732198-0f1a-43c8-b2dc-035fac7d6683",
+      "created": "2024-12-19T10:20:18.9522163Z"
+    }
+  ]
+  ```
+  15. Удаляем один из постов `http://localhost:7888/api/Post/Delete/76c3b784-d220-40f6-898b-59707392752a`, смотрим фид друга
+  `http://localhost:7888/api/Post/Feed/67226925-f615-48c2-8fe6-a0f47e9f385f`, остался один пост.
+  ```
+  [
+    {
+      "id": "e38334c7-85fc-4873-86a8-a0fe0f5e473e",
+      "text": "string",
+      "userId": "be732198-0f1a-43c8-b2dc-035fac7d6683",
+      "created": "2024-12-19T09:27:21.7906913Z"
+    }
+  ]
+  ```
+  16. Инвалидация кеша  в случае обновление друзей, модификации, добавлении и удалении постов работает корректно после 
+  события в брокере сообщений.
+  17. Также можно посмореть на происходящее в кафке ui:
+  ```
+ http://localhost:8080/ui/clusters/local/all-topics/update-feed-posts/messages?keySerde=String&valueSerde=String&limit=100
+ ```

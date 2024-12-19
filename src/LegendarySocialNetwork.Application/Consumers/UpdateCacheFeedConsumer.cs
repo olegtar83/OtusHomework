@@ -89,7 +89,7 @@ namespace LegendarySocialNetwork.Application.Consumers
         private async Task<List<PostMessage>> GetLimitedPostsAsync(string userId)
         {
             var res = await _postRepository.GetLimitedFeedAsync(userId);
-            return _mapper.Map<List<PostMessage>>(res.Value);;
+            return _mapper.Map<List<PostMessage>>(res.Value); ;
         }
     }
 }

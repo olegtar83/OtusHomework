@@ -1,6 +1,7 @@
 # Полусинхронная репликация
 1) Создаем мастер со следующеми настройками
-```listen_addresses = 'localhost,172.21.0.2'
+```
+listen_addresses = 'localhost,172.21.0.2'
 max_connections = 100
 ssl = off
 shared_buffers = 1GB
@@ -26,7 +27,7 @@ min_wal_size = 80MB
 
 wal_level = replica
 max_wal_senders = 8
-primary_conninfo = 'host=master-db port=5432 user=replicator password=pass application_name=slave1-db'
+primary_conninfo = 'host=master-db port=5432 user=replicator password=replicator application_name=slave1-db'
 ```
 3) Создаем вторую реплику
 ```
@@ -40,7 +41,7 @@ min_wal_size = 80MB
 
 wal_level = replica
 max_wal_senders = 8
-primary_conninfo = 'host=master-db port=5432 user=replicator password=pass application_name=slave2-db'
+primary_conninfo = 'host=master-db port=5432 user=replicator password=replicator application_name=slave2-db'
 ```
 4) Добавляем юзер для репликации в дамп на мастере
 ```
@@ -72,7 +73,7 @@ xcopy .\postgres_backup_slave2\* .\postgres_data_slave2\ /E /I /Y
 docker compose start slave1-db
 docker compose start slave2-db
 ```
-8) Смотри в логах реплики появидась следуещея строчка
+8) Смотрим в логах реплики, должна появиться следующея строчка
 ```
 started streaming WAL from primary at 0/10000000 on timeline 1
 ```

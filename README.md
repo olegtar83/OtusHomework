@@ -5,7 +5,7 @@
 * PostgreSQL
 * Kafka
 * Redis
-* Dapper
+* Dapper (Raw Sql)
 
 Инструкция по запуску:
 ```

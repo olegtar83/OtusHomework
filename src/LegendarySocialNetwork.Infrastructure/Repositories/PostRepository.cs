@@ -4,8 +4,10 @@ using LegendarySocialNetwork.Application.Common.Models;
 using LegendarySocialNetwork.Domain.Entities;
 using LegendarySocialNetwork.Infrastructure.Common.Options;
 using MediatR;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Options;
 using Npgsql;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace LegendarySocialNetwork.Infrastructure.Repositories
 {
@@ -78,14 +80,12 @@ namespace LegendarySocialNetwork.Infrastructure.Repositories
         public async Task<Result<List<PostEntity>>> GetLimitedFeedAsync(string user_id, int? limit = 1000)
         {
             await using var con = await _readDb.OpenConnectionAsync();
-            var sql = @"SELECT p.id, p.user_id, p.text, p.created, p.updated 
-                (u.first_name + ' ' + u.second.name) as name
-                FROM public.""post"" as p
-                inner join on user as u on p.user_id = u.id
-                WHERE user_id in (SELECT addressed_id FROM public.""friendship""
-				where requester_id = @user_id)
-				or user_id in (SELECT requester_id FROM public.""friendship""
-				where addressed_id = @user_id) LIMIT @limit;";
+            var sql = @"SELECT id, user_id, text, created, updated FROM public.post
+                WHERE user_id in (SELECT addressed_id FROM public.friendship
+                where requester_id = @user_id)
+				or user_id in (SELECT requester_id FROM public.friendship
+                where addressed_id = @user_id)
+                LIMIT @limit";
             var items = await con.QueryAsync<PostEntity>(sql, new { user_id, limit });
             return Result<List<PostEntity>>.Success(items.ToList());
         }

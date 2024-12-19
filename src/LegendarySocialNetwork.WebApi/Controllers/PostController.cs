@@ -21,22 +21,34 @@ namespace LegendarySocialNetwork.WebApi.Controllers
         [HttpPost("[action]")]
         public async Task<IActionResult> Create(CreatePostCommandRequest request)
         {
-            await Mediator.Send(request);
-            return Ok("Успешно создан пост");
+            var res = await Mediator.Send(request);
+            if (res.Succeeded)
+            {
+                return Ok("Успешно создан пост");
+            }
+            return BadRequest(res.Error);
         }
 
         [HttpPut("[action]")]
         public async Task<IActionResult> Update(UpdatePostCommandRequest request)
         {
-            await Mediator.Send(request);
-            return Ok("Успешно изменен пост");
+            var res = await Mediator.Send(request);
+            if (res.Succeeded)
+            {
+                return Ok("Успешно изменен пост");
+            }
+            return BadRequest(res.Error);
         }
 
         [HttpPut("[action]/{id}")]
         public async Task<IActionResult> Delete(string id)
         {
-            await Mediator.Send(new DeletePostCommandRequest(id));
-            return Ok("Успешно удален пост");
+            var res = await Mediator.Send(new DeletePostCommandRequest(id));
+            if (res.Succeeded)
+            {
+                return Ok("Успешно удален пост");
+            }
+            return BadRequest(res.Error);
         }
 
         [HttpGet("[action]/{id}")]
@@ -55,6 +67,10 @@ namespace LegendarySocialNetwork.WebApi.Controllers
         public async Task<IActionResult> Feed(string? id)
         {
             var res = await Mediator.Send(new GetFeedCommandRequest(id));
+            if (!res.Succeeded)
+            {
+                return BadRequest(res.Error.ToString());
+            }
             var posts = _mapper.Map<List<PostDto>>(res.Value);
             return Ok(posts);
         }

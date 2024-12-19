@@ -35,7 +35,8 @@ namespace LegendarySocialNetwork.Infrastructure.Repositories
             await using var con = await _writeDb.OpenConnectionAsync();
 
             await using var cmd = new NpgsqlCommand("DELETE FROM public.\"friendship\"\r\n" +
-                "\r\nWHERE requester_id = @requester_id and addressed_id = @addressed_id", con)
+                "\r\nWHERE requester_id = @requester_id and addressed_id = @addressed_id" +
+                " or addressed_id = @requester_id and requester_id = @addressed_id", con)
             {
                 Parameters = {
                 new("requester_id", requesterUserId),
@@ -58,11 +59,15 @@ namespace LegendarySocialNetwork.Infrastructure.Repositories
         public async Task<Result<List<FriendEntity>>> GetFriendsAsync(string user_id)
         {
             await using var con = await _readDb.OpenConnectionAsync();
-            var sql = @"SELECT u.id, (u.first_name + ' ' + u.second_name) as name, u.city
-                       where u.id in (SELECT addressed_id FROM public.""friendship""
-                       where requester_id = @user_id)
-                       or u.id in (or user_id in (SELECT requester_id FROM public.""friendship""
-                       where addressed_id = @user_id);";
+            var sql = @"SELECT 
+                u.id, 
+                (u.first_name || ' ' || u.second_name) AS name, 
+                u.city
+            FROM 
+                public.user AS u
+            WHERE 
+                u.id IN (SELECT addressed_id FROM public.friendship WHERE requester_id = @user_id)
+                OR u.id IN (SELECT requester_id FROM public.friendship WHERE addressed_id = @user_id);";
             var items = await con.QueryAsync<FriendEntity>(sql, new { user_id });
             return Result<List<FriendEntity>>.Success(items.ToList());
         }

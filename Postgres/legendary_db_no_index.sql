@@ -63,9 +63,28 @@ CREATE TABLE IF NOT EXISTS public."user" (
 
 ALTER TABLE public."user" OWNER TO dbuser;
 
+CREATE TABLE IF NOT EXISTS public."friendship" (
+    requester_id character varying NOT NULL,
+    addressed_id character varying NOT NULL,
+    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+ALTER TABLE public."friendship" OWNER TO dbuser;
+
 --
 -- Data for Name: account; Type: TABLE DATA; Schema: public; Owner: dbuser
 --
+
+CREATE TABLE IF NOT EXISTS public."post" (
+    id character varying NOT NULL,
+    user_id character varying NOT NULL,
+    text character varying NOT NULL,
+    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+ALTER TABLE public."post" OWNER TO dbuser;
 
 COPY public.account (id, password) FROM stdin;
 a8edbe9c-2700-474b-ad06-b1d74dab2b79	AQAAAAEAACcQAAAAEAsOlTw5sARL4I7SE2gYD4JxyGoCx4DdpBgO7QPXBMCERo4k6PVh1TDLC97Yd7Lfiw==

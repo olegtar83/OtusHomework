@@ -23,67 +23,19 @@ services:
       - ./Postgres/master_postgresql.conf:/etc/postgresql/postgresql.conf
       - ./Postgres/master_pg_hba.conf:/etc/postgresql/pg_hba.conf
       - ./Postgres:/docker-entrypoint-initdb.d # Инициализация таблиц
-      - ./postgres_data_master:/var/lib/postgresql/data
+      - ./volumes/postgres_data_master:/var/lib/postgresql/data
     networks:
-      legendary-network:
-        ipv4_address: 172.21.0.2
-  slave1-db:
-    image: postgres:14
-    container_name: slave1-db
-    environment:
-      POSTGRES_DB: "legendarydb"
-      POSTGRES_USER: "dbuser"
-      POSTGRES_PASSWORD: "dbpassword"
-    command: [
-      "postgres", 
-      "-c", 
-      "config_file=/etc/postgresql/postgresql.conf",
-      "-c", 
-      "hba_file=/etc/postgresql/pg_hba.conf"
-      ]
-    mem_limit: 2048m
-    shm_size: 1gb 
-    ports:
-      - 5433:5432
-    volumes:
-      - ./Postgres/slave1_postgresql.conf:/etc/postgresql/postgresql.conf
-      - ./Postgres/slave1_pg_hba.conf:/etc/postgresql/pg_hba.conf
-      - ./postgres_data_slave1:/var/lib/postgresql/data
-      - ./postgres_backup_slave1:/backup
-    networks:
-      legendary-network:
-        ipv4_address: 172.21.0.3
-  slave2-db:
-    image: postgres:14
-    container_name: slave2-db
-    environment:
-      POSTGRES_DB: "legendarydb"
-      POSTGRES_USER: "dbuser"
-      POSTGRES_PASSWORD: "dbpassword"
-    command: [
-      "postgres", 
-      "-c", 
-      "config_file=/etc/postgresql/postgresql.conf",
-      "-c", 
-      "hba_file=/etc/postgresql/pg_hba.conf"
-      ]
-    mem_limit: 2048m
-    shm_size: 1gb 
-    ports:
-      - 5434:5432
-    volumes:
-      - ./Postgres/slave2_postgresql.conf:/etc/postgresql/postgresql.conf
-      - ./Postgres/slave2_pg_hba.conf:/etc/postgresql/pg_hba.conf
-      - ./postgres_data_slave2:/var/lib/postgresql/data
-      - ./postgres_backup_slave2:/backup
-    networks:
-      legendary-network:
-        ipv4_address: 172.21.0.4
+      - legendary-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dbuser -d legendarydb"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
   legendary-api:
     image: legendary-api-image
     build:
-      context: ./src/LegendarySocialNetwork
-      dockerfile: Dockerfile
+      context: ./src
+      dockerfile: LegendarySocialNetwork.WebApi/Dockerfile
     container_name: legendary-api
     restart: always
     environment:
@@ -92,36 +44,81 @@ services:
       AllowedHosts: "*" # Ограничивает хосты, которые могут подключаться к API. По умолчанию - все
       # Строка подключения к базе данных Postgres
       DatabaseSettings:MasterConnStr: "Host=master-db;Port=5432;Username=dbuser;Password=dbpassword;Database=legendarydb;Pooling=true;Maximum Pool Size=950;Minimum Pool Size=200;Timeout=300;CommandTimeout=300;Connection Idle Lifetime=300;Connection Pruning Interval=10;Keepalive=60;TCP Keepalive Time=60;TCP Keepalive Interval=10"
-      DatabaseSettings:ReplicaConnStr1: "Host=slave1-db;Port=5432;Username=dbuser;Password=dbpassword;Database=legendarydb;Pooling=true;Maximum Pool Size=950;Minimum Pool Size=200;Timeout=300;CommandTimeout=300;Connection Idle Lifetime=300;Connection Pruning Interval=10;Keepalive=60;TCP Keepalive Time=60;TCP Keepalive Interval=10"
-      DatabaseSettings:ReplicaConnStr2: "Host=slave2-db;Port=5432;Username=dbuser;Password=dbpassword;Database=legendarydb;Pooling=true;Maximum Pool Size=950;Minimum Pool Size=200;Timeout=300;CommandTimeout=300;Connection Idle Lifetime=300;Connection Pruning Interval=10;Keepalive=60;TCP Keepalive Time=60;TCP Keepalive Interval=10"
       JWTSettings:Key: "superSecretKey@34512312312312312"
       JWTSettings:Issuer: legendary.social.network
       JWTSettings:Audience: legendary.social.network
       JWTSettings:DurationInMinutes: "60"
+      Kafka:Host: kafka:29092
+      Kafka:UpdateFeedTopic: update-feed-posts
+      Kafka:UpdateFeedGroup: update-feed-group
+      Redis:ConnectionString: redis:6379,password=123b
     ports:
       - 7888:80
     mem_limit: 1024m
-    entrypoint: dotnet LegendarySocialNetwork.dll
+    entrypoint: dotnet LegendarySocialNetwork.WebApi.dll
     depends_on:
-      - master-db
-      - slave1-db
-      - slave2-db 
+       master-db:
+          condition: service_healthy
+       kafka:
+          condition: service_started
+       redis:
+          condition: service_started
     networks:
       - legendary-network
-  # legendary-react-app:
-  #   build:
-  #     context: ./legendary-client  # Update this to the path where your React app is located
-  #     dockerfile: Dockerfile  # Make sure you have a Dockerfile in this directory for your React app
-  #   container_name: legendary-react-app
-  #   ports:
-  #     - 3000:80  # Map port 3000 on the host to port 80 in the container
-  #   networks:
-  #     - legendary-network    
+  redis:
+    image: "redis:alpine"
+    container_name: 'redis'
+    command: redis-server --requirepass 123b
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./volumes/redis-data:/var/lib/redis
+      - ./volumes/config/redis.conf:/usr/local/etc/redis/redis.conf
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    networks:
+      - legendary-network
+  kafka:
+    image: confluentinc/cp-kafka:7.8.0
+    container_name: kafka
+    hostname: kafka
+    ports:
+      - "9092:9092"
+      - "9101:9101"
+    environment:
+     KAFKA_NODE_ID: 1
+     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+     KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092'
+     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+     KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+     KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+     KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+     KAFKA_JMX_PORT: 9101
+     KAFKA_JMX_HOSTNAME: localhost
+     KAFKA_PROCESS_ROLES: 'broker,controller'
+     KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:29093'
+     KAFKA_LISTENERS: 'PLAINTEXT://kafka:29092,CONTROLLER://kafka:29093,PLAINTEXT_HOST://0.0.0.0:9092'
+     KAFKA_INTER_kafka_LISTENER_NAME: 'PLAINTEXT'
+     KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+     KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
+     CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
+    networks:
+      - legendary-network
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    environment:
+      KAFKA_CLUSTERS_0_NAME: "local"
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "kafka:29092"
+    ports:
+      - "8080:8080"
+    networks:
+      - legendary-network
+    depends_on:
+      - kafka
+volumes:
+  kafka-data:  # Define a volume for Kafka data
 networks:
   legendary-network:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 172.21.0.0/16
-          gateway: 172.21.0.1
 

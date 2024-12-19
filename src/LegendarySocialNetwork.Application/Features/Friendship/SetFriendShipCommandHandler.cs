@@ -26,21 +26,15 @@ namespace LegendarySocialNetwork.Application.Features.Friendship
         {
             await _friendshipRepository.SetAsync(_currentUserService.GetUserId, request.userId);
 
-            await _publisher.Publish(new UpdateFeedEventRequested(
-             new Domain.Messages.UpdateFeedMessage
-             {
-                 Operation = Domain.Messages.Operation.Reset,
-                 UserId = _currentUserService.GetUserId
-             }
-                ));
-
-            await _publisher.Publish(new UpdateFeedEventRequested(
-             new Domain.Messages.UpdateFeedMessage
-             {
-                 Operation = Domain.Messages.Operation.Reset,
-                 UserId = request.userId
-             }
-                ));
+            foreach (var participantId in new[] { _currentUserService.GetUserId, request.userId })
+            {
+                await _publisher.Publish(new UpdateFeedEventRequested(
+               new Domain.Messages.UpdateFeedMessage
+               {
+                   Operation = Domain.Messages.Operation.Reset,
+                   UserId = participantId
+               }));
+            }
             return Result<Unit>.Success(Unit.Value);
         }
     }

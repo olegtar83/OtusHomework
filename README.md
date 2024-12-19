@@ -4,8 +4,8 @@
 * C#
 * PostgreSQL
 * Kafka
-* Redis
 * Dapper (Raw Sql)
+* Redis
 
 Инструкция по запуску:
 ```

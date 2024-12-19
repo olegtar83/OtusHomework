@@ -31,7 +31,7 @@ namespace LegendarySocialNetwork.WebApi.Controllers
             return BadRequest(res.Error.ToString());
         }
 
-        [HttpPut("[action]")]
+        [HttpGet("[action]")]
         public async Task<IActionResult> Get()
         {
             var res = await Mediator.Send(new GetFriendsCommandRequest());

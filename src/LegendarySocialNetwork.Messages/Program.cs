@@ -1,44 +1,106 @@
+using LegendarySocialNetwork.Messages.Database;
+using LegendarySocialNetwork.Messages.Filters;
+using LegendarySocialNetwork.Messages.Middlewares;
+using LegendarySocialNetwork.Messages.Services;
+using LegendarySocialNetwork.Messages.Utilities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Text;
+
+var config = new ConfigurationBuilder().AddEnvironmentVariables().Build();
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+builder.Services.AddControllers(options =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    options.Filters.Add(typeof(ValidateModelStateAttribute));
+});
+builder.Services.AddCors(options => options
+.AddDefaultPolicy(corsBuilder => corsBuilder
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod()));
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+    .AddJwtBearer(o =>
+    {
+        o.RequireHttpsMetadata = false;
+        o.TokenValidationParameters = new TokenValidationParameters
+        {
+
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = false,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = config["JWTSettings:Issuer"],
+            ValidAudience = config["JWTSettings:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JWTSettings:Key"]!)),
+            ClockSkew = TimeSpan.Zero
+        };
+
+    });
+
+builder.Services.Configure<DatabaseSettings>(config.GetSection("DatabaseSettings"));
+config.GetSection(nameof(DatabaseSettings)).Bind(HashUtility.DbSetting);
+config.GetSection(nameof(DatabaseSettings)).Bind(DatabaseInitialization.DbSetting);
+
+builder.Services.AddScoped<IDatabaseContext, DatabaseContext>();
+builder.Services.AddTransient<IDialogService, DialogService>();
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Version = "v1",
+        Title = "Legendary.Social.Network",
+        Description = ""
+    });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        Description = "Input your Bearer token in this format - Bearer {your token here} to access this API",
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer",
+                            },
+                            Scheme = "Bearer",
+                            Name = "Bearer",
+                            In = ParameterLocation.Header,
+                        }, new List<string>()
+                    },
+                });
+});
+var app = builder.Build();
+DatabaseInitialization.Init();
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+app.UseAuthorization();
+app.UseMiddleware<ErrorHandlerMiddleware>();
+app.UseCors();
+app.MapControllers();
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
 
 app.Run();
-
-internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

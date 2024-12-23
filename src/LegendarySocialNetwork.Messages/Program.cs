@@ -2,7 +2,6 @@ using LegendarySocialNetwork.Messages.Database;
 using LegendarySocialNetwork.Messages.Filters;
 using LegendarySocialNetwork.Messages.Middlewares;
 using LegendarySocialNetwork.Messages.Services;
-using LegendarySocialNetwork.Messages.Utilities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -51,8 +50,6 @@ builder.Services.AddAuthentication(options =>
     });
 
 builder.Services.Configure<DatabaseSettings>(config.GetSection("DatabaseSettings"));
-config.GetSection(nameof(DatabaseSettings)).Bind(HashUtility.DbSetting);
-config.GetSection(nameof(DatabaseSettings)).Bind(DatabaseInitialization.DbSetting);
 
 builder.Services.AddScoped<IDatabaseContext, DatabaseContext>();
 builder.Services.AddTransient<IDialogService, DialogService>();
@@ -91,7 +88,6 @@ builder.Services.AddSwaggerGen(c =>
                 });
 });
 var app = builder.Build();
-DatabaseInitialization.Init();
 app.UseSwagger();
 app.UseSwaggerUI();
 

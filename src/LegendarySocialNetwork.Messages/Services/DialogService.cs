@@ -1,7 +1,6 @@
 ﻿using LegendarySocialNetwork.Messages.Database;
 using LegendarySocialNetwork.Messages.DataClasses.Models;
 using LegendarySocialNetwork.Messages.DataClasses.Responses;
-using LegendarySocialNetwork.Messages.Utilities;
 
 namespace LegendarySocialNetwork.Messages.Services
 {
@@ -21,13 +20,8 @@ namespace LegendarySocialNetwork.Messages.Services
 
         public async Task<Result<string>> SetDialogAsync(string from, string text, string to)
         {
-            var resId = await _databaseContext.GetDialogIdAsync(from, to);
 
-            string id = resId.Succeeded ? resId.Value : Guid.NewGuid().ToString();
-
-            int shardId = HashUtility.HashIdToShard(id);
-
-            return await _databaseContext.SetDialogAsync(id, from, text, to, shardId);
+            return await _databaseContext.SetDialogAsync(from, text, to);
         }
 
         public async Task<Result<List<DialogResp>>> GetDialogsAsync(string userId)

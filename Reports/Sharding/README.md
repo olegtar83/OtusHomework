@@ -1,8 +1,8 @@
 # Sharding
 
-Выбранная стратегия - для того чтобы избежать эффекта Лейди Гага, при котором один пользователь имеет очень большое количество чатов и тем самым перегружает выбранные шарды, принято решение использовать шардинированный ключ который, создаваемый на отоснове сочетания двух участников чата. Таким образом , если человек становится популярным и получает ножество сообщений, чаты будут распределяться равномерно по шардовым кластерам.
+Выбранная стратегия - ключ шардирования будет первичным ключом (id) в таблице messages. Таким образом, чаты разных людей будут  равномерно расположены по шард-серверам; это решение не идеально, однако решения о том, как эффективно шардировать по заранее готовому ключу из хеш функции и целиком хранить весь чат на одном шарде я не нашёл. Потому что при решардировании Citus потребовал наличия первичного ключа или уникального ограничения (UNIQUE), причём при стратегии shardId от 0 и до 31 который был один раз привязавался к чату, shardId не являлся бы уникальным, что делает невозможным последующее решардирование. 
 
-1) Создается таблица при запуске приложения
+1) Создается таблицу после запуска приложения
 ```
 CREATE TABLE IF NOT EXISTS messages (
        id UUID PRIMARY KEY,
@@ -11,9 +11,9 @@ CREATE TABLE IF NOT EXISTS messages (
        "to" CHARACTER VARYING NOT NULL
                       );
 ```
-2) Ключ шардирования для каждого чата будет одинаковый и будет заранее подготовленной хеш функцией в коде и будет иметь 32 значения, как количество шардов в нодах -
+2) Ключ шардирования 
 ```
- SELECT create_distributed_table('messages', 'shardId');
+ SELECT create_distributed_table('messages', 'id');
 ```
 3) Переходим на `http://localhost:7888/swagger/index.html`, зарегистрировать нового юзера, забрать jwt token, потом перейти
    в новый сервис сообщений `http://localhost:7888/swagger/index.html`, авторизировать с токеном и начать слать сообщения c
@@ -45,5 +45,32 @@ select * from public.messages where "from" = '92ed438b-a4ba-4e78-8e49-8437e7c945
  Planning Time: 1.259 ms
  Execution Time: 30.896 ms
 ```
-5) Весь запрос прошол в рамках одного шарда `messages_102009`.
 ### Resharding
+
+1)Добавим еще несколько шардов
+```
+set POSTGRES_PASSWORD=pass && docker-compose -p citus up --scale worker=5 -d
+```
+2) Проверяем видимость
+```
+SELECT master_get_active_worker_nodes();
+SELECT nodename, count(*) FROM citus_shards GROUP BY nodename;
+```
+3) Переходим в psql и меняем wal_level
+```
+alter system set wal_level = logical;
+SELECT run_command_on_workers('alter system set wal_level = logical');
+```
+4)Рестартим docker
+```
+set POSTGRES_PASSWORD=pass && docker-compose restart
+```
+5)Запускаем перебалансировку
+```
+SELECT * FROM citus_rebalance_status();
+```
+6) Смотрим распределение
+```
+SELECT nodename, count(*) FROM citus_shards GROUP BY nodename;
+
+```

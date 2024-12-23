@@ -24,22 +24,20 @@ public class DatabaseContext : IDatabaseContext, IDisposable
         await db.DisposeAsync();
     }
 
-    public async Task<Result<string>> SetDialogAsync(string id, 
-        string from, string to, string text, int shardId)
+    public async Task<Result<string>> SetDialogAsync(string from, string to, string text)
     {
         await using var con = await db.OpenConnectionAsync();
         // Create account
         await using var cmd = new NpgsqlCommand("INSERT INTO public.messages\r\n" +
-            "(id, \"from\", \"to\", \"text\", \"shardId\")\r\n" +
-            "VALUES(@id, @from, @to, @text, @shardId)\r\n" +
+            "(id, \"from\", \"to\", \"text\")\r\n" +
+            "VALUES(@id, @from, @to, @text)\r\n" +
             "RETURNING id;", con)
         {
             Parameters =    {
-                new("id",id),
+                new("id",Guid.NewGuid()),
                 new("from", from),
                 new("to", to),
-                new("text", text),
-                new("shardId", shardId)
+                new("text", text)
             }
         };
         var generatedId = await cmd.ExecuteScalarAsync() as string;
@@ -53,14 +51,5 @@ public class DatabaseContext : IDatabaseContext, IDisposable
         var item = await con.QueryAsync<DialogEntity>(sql, new { id });
         if (item is not null) { return Result<List<DialogEntity>>.Success(item.ToList()); }
         return Result<List<DialogEntity>>.Failure("Not found");
-    }
-
-    public async Task<Result<string>> GetDialogIdAsync(string from, string to)
-    {
-        await using var con = await db.OpenConnectionAsync();
-        var sql = "SELECT id FROM public.\"messages\" WHERE \"from\" = @from or \"to\" = @to LIMIT 1;";
-        var item = await con.QueryAsync<string>(sql, new { from, to });
-        if (item.Any()) { return Result<string>.Success(item.First()); }
-        return Result<string>.Failure("Not found");
     }
 }

@@ -128,6 +128,7 @@ services:
       ASPNETCORE_URLS: "http://+:80"
       AllowedHosts: "*" 
       DatabaseSettings:CitusConnStr: "Host=citus_master;Port=5432;Username=postgres;Password=postgres;Database=postgres;Pooling=true;Maximum Pool Size=950;Minimum Pool Size=200;Timeout=300;CommandTimeout=300;Connection Idle Lifetime=300;Connection Pruning Interval=10;Keepalive=60;TCP Keepalive Time=60;TCP Keepalive Interval=10"
+      DatabaseSettings:ShardsNode: 16
       JWTSettings:Key: "superSecretKey@34512312312312312"
       JWTSettings:Issuer: legendary.social.network
       JWTSettings:Audience: legendary.social.network

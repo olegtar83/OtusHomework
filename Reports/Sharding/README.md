@@ -10,9 +10,7 @@ CREATE TABLE IF NOT EXISTS messages (
        "from" CHARACTER VARYING NOT NULL,
        "to" CHARACTER VARYING NOT NULL,
        "shardId" int NOT NULL,
-       constraint pk primary key(id,"shardId")
-                  );
-
+       constraint pk primary key(id,"shardId") );
 ```
 2) Ключ шардирования 
 ```

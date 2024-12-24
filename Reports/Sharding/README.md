@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS messages (
  SELECT create_distributed_table('messages', 'shardId');
 ```
 3) Переходим на `http://localhost:7888/swagger/index.html`, зарегистрировать нового юзера, забрать jwt token, потом перейти
-   в новый сервис сообщений `http://localhost:7888/swagger/index.html`, авторизировать с токеном и начать слать сообщения c
+   в новый сервис сообщений `http://localhost:7887/swagger/index.html`, авторизировать с токеном и начать слать сообщения c
    рандомным юзером `62189e29-d6cd-4296-9dc2-c345512a3204`.
 
 4) Сделать запрос на сообщения по тому же юзеру -

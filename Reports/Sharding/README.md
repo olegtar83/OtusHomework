@@ -60,6 +60,8 @@ set POSTGRES_PASSWORD=pass && docker-compose -p citus up --scale worker=5 -d
 SELECT master_get_active_worker_nodes();
 SELECT nodename, count(*) FROM citus_shards GROUP BY nodename;
 ```
+![first](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Sharding/first.png)
+
 3) Переходим в psql и меняем wal_level
 ```
 alter system set wal_level = logical;

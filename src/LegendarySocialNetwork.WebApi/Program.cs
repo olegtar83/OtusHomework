@@ -7,7 +7,6 @@ using LegendarySocialNetwork.WebApi.Configuration;
 using LegendarySocialNetwork.WebApi.Middlewares;
 using LegendarySocialNetwork.WebApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Reflection;

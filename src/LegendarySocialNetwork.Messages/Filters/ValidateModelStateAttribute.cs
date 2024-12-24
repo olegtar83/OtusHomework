@@ -1,9 +1,8 @@
 ﻿
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Text.Json;
 using LegendarySocialNetwork.Messages.DataClasses.Responses;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using System.Text.Json;
 
 namespace LegendarySocialNetwork.Messages.Filters;
 

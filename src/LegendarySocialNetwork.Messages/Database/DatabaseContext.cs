@@ -1,24 +1,21 @@
-﻿
-using Dapper;
+﻿using Dapper;
 using LegendarySocialNetwork.Messages.Database.Entities;
 using LegendarySocialNetwork.Messages.DataClasses.Models;
+using LegendarySocialNetwork.Messages.Utilities;
 using Microsoft.Extensions.Options;
-
 using Npgsql;
 
 namespace LegendarySocialNetwork.Messages.Database;
 
 public class DatabaseContext : IDatabaseContext, IDisposable
 {
-    public DatabaseContext(IOptions<DatabaseSettings> settings, ILogger<DatabaseContext> logger)
+    public DatabaseContext(IOptions<DatabaseSettings> settings)
     {
         connStr = settings.Value.CitusConnStr;
-        _logger = logger;
         db = NpgsqlDataSource.Create(connStr);
     }
     private readonly string connStr;
     private readonly NpgsqlDataSource db;
-    private readonly ILogger<DatabaseContext> _logger;
     public async void Dispose()
     {
         await db.DisposeAsync();
@@ -27,17 +24,17 @@ public class DatabaseContext : IDatabaseContext, IDisposable
     public async Task<Result<string>> SetDialogAsync(string from, string to, string text)
     {
         await using var con = await db.OpenConnectionAsync();
-        // Create account
+
         await using var cmd = new NpgsqlCommand("INSERT INTO public.messages\r\n" +
-            "(id, \"from\", \"to\", \"text\")\r\n" +
-            "VALUES(@id, @from, @to, @text)\r\n" +
+            "(text, \"from\", \"to\", \"shardId\")\r\n" +
+            "VALUES(@text, @from, @to, @shardId)\r\n" +
             "RETURNING id;", con)
         {
             Parameters =    {
-                new("id",Guid.NewGuid()),
                 new("from", from),
                 new("to", to),
-                new("text", text)
+                new("text", text),
+                new("shardId", HashUtility.GetHashId(from, to)),
             }
         };
         var generatedId = await cmd.ExecuteScalarAsync() as string;

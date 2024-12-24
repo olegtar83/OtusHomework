@@ -1,6 +1,6 @@
 # Sharding
 
-Выбранная стратегия - для того чтобы избежать эффекта Лейди Гага, при котором один пользователь имеет очень большое количество чатов и тем самым перегружает выбранные шарды, принято решение использовать шардинированный ключ который, создавается на основе сочетания двух участников чата. Таким образом , если человек становится популярным и получает ножество сообщений, чаты будут распределяться равномерно по шардовым кластерам.
+Выбранная стратегия - для того чтобы избежать эффекта Лейди Гага, при котором один пользователь имеет очень большое количество чатов и тем самым перегружает выбранные шарды, принято решение использовать шардинированный ключ который, создавается на основе сочетания двух участников чата. Таким образом, если человек становится популярным и получает ножество сообщений, чаты будут распределяться равномерно по шардовым кластерам.
 
 1) Создается таблицу после запуска приложения
 ```
@@ -51,7 +51,7 @@ Custom Scan (Citus Adaptive)  (cost=0.00..0.00 rows=100000 width=104) (actual ti
 ```
 ### Resharding
 
-1)Добавим еще несколько шардов
+1) Добавим еще несколько шардов
 ```
 set POSTGRES_PASSWORD=pass && docker-compose -p citus up --scale worker=5 -d
 ```
@@ -65,16 +65,26 @@ SELECT nodename, count(*) FROM citus_shards GROUP BY nodename;
 alter system set wal_level = logical;
 SELECT run_command_on_workers('alter system set wal_level = logical');
 ```
-4)Рестартим docker
+![wal](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Sharding/wal.png)
+
+4) Рестартим docker
 ```
 set POSTGRES_PASSWORD=pass && docker-compose restart
 ```
-5)Запускаем перебалансировку
+5) Смотрим уровень реплики
+```
+show wal_level;
+```
+![wal](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Sharding/logical.png)
+
+6) Запускаем перебалансировку
 ```
 SELECT * FROM citus_rebalance_status();
 ```
-6) Смотрим распределение
+![rebalance](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Sharding/rebalance.png)
+
+7) Смотрим распределение
 ```
 SELECT nodename, count(*) FROM citus_shards GROUP BY nodename;
-
 ```
+![done](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Sharding/done.png)

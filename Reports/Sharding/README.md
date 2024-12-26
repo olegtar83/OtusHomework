@@ -33,7 +33,7 @@ select * from public.messages where "to" = '5e0db4db-c206-4edc-84c7-5b159030c767
   2 | kjkj   | 6d9d6850-496c-49b0-9d31-c5d01fa0eeee | 5e0db4db-c206-4edc-84c7-5b159030c767 |      21
   3 | biubui | 6d9d6850-496c-49b0-9d31-c5d01fa0eeee | 5e0db4db-c206-4edc-84c7-5b159030c767 |      21
 ```
-5) Теперь сделать тот же запрос с `explain analyze`
+5) Теперь сделать тот же запрос с `explain analyze`, запрос отработал с одного шарда `messages_102026`
 ```
 Custom Scan (Citus Adaptive)  (cost=0.00..0.00 rows=100000 width=104) (actual time=39.928..39.929 rows=3 loops=1)
    Task Count: 32

@@ -47,7 +47,10 @@ namespace LegendarySocialNetwork.Infrastructure.Repositories
         public async Task<Result<AccountEntity>> GetLoginAsync(string id)
         {
             await using var con = await _readDb.OpenConnectionAsync();
-            var sql = "SELECT id, \"password\" FROM public.account WHERE id = @id LIMIT 1;";
+            var sql = @"SELECT a.id, (u.first_name || ' ' || u.second_name) AS name,  a.password FROM 
+                public.account as a
+                inner join public.user as u on u.id = a.id
+                WHERE a.id = @id LIMIT 1;";
             var item = await con.QueryFirstOrDefaultAsync<AccountEntity>(sql, new { id });
             if (item is not null) { return Result<AccountEntity>.Success(item); }
             return Result<AccountEntity>.Failure("Not found");

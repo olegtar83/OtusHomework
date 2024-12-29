@@ -6,6 +6,8 @@ namespace LegendarySocialNetwork.Application.Features.Auth.Register
 {
     public class RegisterUserRequest : IRequest<Result<string>>
     {
+        public required string Id { get; set; }
+
         public required string First_name { get; set; }
 
         public required string Second_name { get; set; }

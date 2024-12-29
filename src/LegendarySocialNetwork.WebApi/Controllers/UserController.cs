@@ -35,7 +35,8 @@ public class UserController : ApiControllerBase
         if (result.Succeeded)
         {
             var claims = new List<Claim> {
-                   new Claim(ClaimTypes.NameIdentifier, result.Value)
+                   new Claim(ClaimTypes.NameIdentifier, result.Value),
+                   new Claim(ClaimTypes.Name, $"{request.First_name} {request.Second_name}")
                 };
             var jwt = JwtHelper.GenerateJWToken(claims);
             var token = new JwtSecurityTokenHandler().WriteToken(jwt);

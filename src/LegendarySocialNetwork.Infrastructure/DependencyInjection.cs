@@ -48,6 +48,8 @@ namespace LegendarySocialNetwork.Infrastructure
                 x.AddRider(rider =>
                 {
                     rider.AddConsumer<UpdateCacheFeedConsumer>();
+                    rider.AddConsumer<PushFeedWebSocketConsumer>();
+
 
                     rider.UsingKafka((context, k) =>
                     {
@@ -60,6 +62,14 @@ namespace LegendarySocialNetwork.Infrastructure
                             e.ConfigureConsumer<UpdateCacheFeedConsumer>(context);
                             e.AutoOffsetReset = AutoOffsetReset.Earliest;
                         });
+
+                        k.TopicEndpoint<UpdateFeedMessage>(Environment.GetEnvironmentVariable("Kafka:PushFeedTopic"),
+                           Environment.GetEnvironmentVariable("Kafka:PushFeedGroup"), e =>
+                           {
+                               e.CreateIfMissing(x => x.ReplicationFactor = 1);
+                               e.ConfigureConsumer<PushFeedWebSocketConsumer>(context);
+                               e.AutoOffsetReset = AutoOffsetReset.Earliest;
+                           });
                     });
                 });
 

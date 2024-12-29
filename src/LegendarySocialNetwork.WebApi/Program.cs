@@ -4,6 +4,7 @@ using LegendarySocialNetwork.Infrastructure;
 using LegendarySocialNetwork.Services;
 using LegendarySocialNetwork.WebApi.Auxiliary;
 using LegendarySocialNetwork.WebApi.Configuration;
+using LegendarySocialNetwork.WebApi.Hubs;
 using LegendarySocialNetwork.WebApi.Middlewares;
 using LegendarySocialNetwork.WebApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -28,19 +29,30 @@ builder.Services.Configure<JWTSettings>(config.GetSection("JWTSettings"));
 
 builder.Configuration.GetSection(nameof(JWTSettings)).Bind(JwtHelper.JWTSettings);
 
-builder.Services.AddCors(options => options
-.AddDefaultPolicy(corsBuilder => corsBuilder
-            .AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod()));
-
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        builder =>
+        {
+            builder
+                .AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+builder.Services.AddSignalR(options =>
+{
+    options.EnableDetailedErrors = true;
+});
 builder.Services.AddHttpContextAccessor();
 
+
+builder.Services.AddScoped<IPushHubNotifier, PushHubNotifier>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure();
-
+builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -103,12 +115,11 @@ var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
-
+app.UseCors();
 app.UseHttpsRedirection();
-
+app.MapHub<FeedHub>("feed");
 app.UseAuthorization();
 app.UseMiddleware<ErrorHandlerMiddleware>();
-app.UseCors();
 app.MapControllers();
 
 app.Run();

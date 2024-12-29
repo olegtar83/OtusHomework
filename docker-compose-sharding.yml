@@ -1,0 +1,185 @@
+﻿version: "3.9"
+
+services:
+  master-db:
+    image: postgres:14
+    container_name: master-db
+    environment:
+      POSTGRES_DB: "legendarydb"
+      POSTGRES_USER: "dbuser"
+      POSTGRES_PASSWORD: "dbpassword"
+    command: [
+      "postgres", 
+      "-c", 
+      "config_file=/etc/postgresql/postgresql.conf",
+      "-c", 
+      "hba_file=/etc/postgresql/pg_hba.conf"
+      ]
+    mem_limit: 2048m
+    shm_size: 1gb 
+    ports:
+      - 5432:5432
+    volumes:
+      - ./Postgres/master_postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./Postgres/master_pg_hba.conf:/etc/postgresql/pg_hba.conf
+      - ./Postgres:/docker-entrypoint-initdb.d # Инициализация таблиц
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - legendary-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dbuser -d legendarydb"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  legendary-api:
+    image: legendary-api-image
+    build:
+      context: ./src
+      dockerfile: LegendarySocialNetwork.WebApi/Dockerfile
+    container_name: legendary-api
+    restart: always
+    environment:
+      # Основные настройки для работы API
+      ASPNETCORE_URLS: "http://+:80"
+      AllowedHosts: "*" # Ограничивает хосты, которые могут подключаться к API. По умолчанию - все
+      # Строка подключения к базе данных Postgres
+      DatabaseSettings:MasterConnStr: "Host=master-db;Port=5432;Username=dbuser;Password=dbpassword;Database=legendarydb;Pooling=true;Maximum Pool Size=950;Minimum Pool Size=200;Timeout=300;CommandTimeout=300;Connection Idle Lifetime=300;Connection Pruning Interval=10;Keepalive=60;TCP Keepalive Time=60;TCP Keepalive Interval=10"
+      JWTSettings:Key: "superSecretKey@34512312312312312"
+      JWTSettings:Issuer: legendary.social.network
+      JWTSettings:Audience: legendary.social.network
+      JWTSettings:DurationInMinutes: "60"
+      Kafka:Host: kafka:29092
+      Kafka:UpdateFeedTopic: update-feed-posts
+      Kafka:UpdateFeedGroup: update-feed-group
+      Redis:ConnectionString: redis:6379,password=123b
+    ports:
+      - 7888:80
+    mem_limit: 1024m
+    entrypoint: dotnet LegendarySocialNetwork.WebApi.dll
+    depends_on:
+       master-db:
+          condition: service_healthy
+       kafka:
+          condition: service_started
+       redis:
+          condition: service_started
+    networks:
+      - legendary-network
+  redis:
+    image: "redis:alpine"
+    container_name: 'redis'
+    command: redis-server --requirepass 123b
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/var/lib/redis
+      - ./volumes/config/redis.conf:/usr/local/etc/redis/redis.conf
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    networks:
+      - legendary-network
+  kafka:
+    image: confluentinc/cp-kafka:7.8.0
+    container_name: kafka
+    hostname: kafka
+    ports:
+      - "9092:9092"
+      - "9101:9101"
+    environment:
+     KAFKA_NODE_ID: 1
+     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+     KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092'
+     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+     KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+     KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+     KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+     KAFKA_JMX_PORT: 9101
+     KAFKA_JMX_HOSTNAME: localhost
+     KAFKA_PROCESS_ROLES: 'broker,controller'
+     KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:29093'
+     KAFKA_LISTENERS: 'PLAINTEXT://kafka:29092,CONTROLLER://kafka:29093,PLAINTEXT_HOST://0.0.0.0:9092'
+     KAFKA_INTER_kafka_LISTENER_NAME: 'PLAINTEXT'
+     KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+     KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
+     CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
+    networks:
+      - legendary-network
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    environment:
+      KAFKA_CLUSTERS_0_NAME: "local"
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "kafka:29092"
+    ports:
+      - "8080:8080"
+    networks:
+      - legendary-network
+    depends_on:
+      - kafka
+  messages-api:
+    image: messages-api-image
+    build:
+      context: ./src
+      dockerfile: LegendarySocialNetwork.Messages/Dockerfile
+    container_name: messages-api
+    restart: always
+    environment:
+      # Основные настройки для работы API
+      ASPNETCORE_URLS: "http://+:80"
+      AllowedHosts: "*" 
+      DatabaseSettings:CitusConnStr: "Host=citus_master;Port=5432;Username=postgres;Password=postgres;Database=postgres;Pooling=true;Maximum Pool Size=950;Minimum Pool Size=200;Timeout=300;CommandTimeout=300;Connection Idle Lifetime=300;Connection Pruning Interval=10;Keepalive=60;TCP Keepalive Time=60;TCP Keepalive Interval=10"
+      DatabaseSettings:ShardsNode: 16
+      JWTSettings:Key: "superSecretKey@34512312312312312"
+      JWTSettings:Issuer: legendary.social.network
+      JWTSettings:Audience: legendary.social.network
+    ports:
+      - 7887:80
+    depends_on:
+        master:
+          condition: service_started
+    mem_limit: 1024m
+    entrypoint: dotnet LegendarySocialNetwork.Messages.dll
+    networks:
+      - legendary-network
+  master:
+    container_name: "${COMPOSE_PROJECT_NAME:-citus}_master"
+    image: "citusdata/citus:12.1.3"
+    ports: ["${COORDINATOR_EXTERNAL_PORT:-5435}:5432"]
+    labels: ["com.citusdata.role=Master"]
+    environment: &AUTH
+      POSTGRES_USER: "${POSTGRES_USER:-postgres}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-postgres}"
+      PGUSER: "${POSTGRES_USER:-postgres}"
+      PGPASSWORD: "${POSTGRES_PASSWORD:-citus}"
+      POSTGRES_HOST_AUTH_METHOD: "${POSTGRES_HOST_AUTH_METHOD:-trust}"
+    networks:
+      - legendary-network
+  worker:
+    image: "citusdata/citus:12.1.3"
+    labels: ["com.citusdata.role=Worker"]
+    depends_on: [manager]
+    environment: *AUTH
+    command: "/wait-for-manager.sh"
+    volumes:
+      - healthcheck-volume:/healthcheck
+    networks:
+      - legendary-network
+  manager:
+    container_name: "${COMPOSE_PROJECT_NAME:-citus}_manager"
+    image: "citusdata/membership-manager:0.3.0"
+    volumes:
+      - "${DOCKER_SOCK:-/var/run/docker.sock}:/var/run/docker.sock"
+      - healthcheck-volume:/healthcheck
+    depends_on: [master]
+    environment: *AUTH
+    networks:
+      - legendary-network
+volumes:
+  kafka-data:
+  healthcheck-volume:
+  redis-data:
+  postgres-data:
+networks:
+  legendary-network:
+    driver: bridge
+

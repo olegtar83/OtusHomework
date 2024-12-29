@@ -1,5 +1,6 @@
-import { type FC, useState } from 'react';
+import { type FC, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from "jwt-decode";
 
 interface RegisterResponse {
   userId: string;
@@ -7,6 +8,7 @@ interface RegisterResponse {
 }
 
 interface RegisterFormData {
+  id: string;
   first_name: string;
   second_name: string;
   age: number;
@@ -19,7 +21,18 @@ interface RegisterFormData {
 
 const Register: FC = () => {
   const navigate = useNavigate();
+
+  // Generate a random GUID function
+  const generateGuid = () => {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  };
+
   const [formData, setFormData] = useState<RegisterFormData>({
+    id: generateGuid(),  // Set initial GUID
     first_name: '',
     second_name: '',
     age: 0,
@@ -40,13 +53,14 @@ const Register: FC = () => {
         throw new Error('Passwords do not match');
       }
 
-      const response = await fetch('http://localhost:7888/user/register', {
+      const registerResponse = await fetch('http://localhost:7888/api/user/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'accept': '*/*'
         },
         body: JSON.stringify({
+          id: formData.id,
           first_name: formData.first_name,
           second_name: formData.second_name,
           age: Number(formData.age),
@@ -57,16 +71,21 @@ const Register: FC = () => {
         })
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (!registerResponse.ok) {
+        const errorData = await registerResponse.json();
         throw new Error(errorData.message || 'Registration failed');
       }
-
-      const data = await response.json();
-      console.log('Registration successful:', data);
+      debugger;
+      const data = await registerResponse.json();
       
-      localStorage.setItem('userId', data.userId);
+      // Store the JWT token
       localStorage.setItem('token', data.token);
+      
+      // Decode and store user info from JWT
+      const decodedToken: any = jwtDecode(data.token);
+      const userName = decodedToken['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'];
+      localStorage.setItem('userName', userName);
+      localStorage.setItem('userId', data.userId);
       
       navigate('/feed');
     } catch (err) {
@@ -91,6 +110,18 @@ const Register: FC = () => {
         {error && <div className="error-message">{error}</div>}
         
         <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <input
+              type="text"
+              name="id"
+              placeholder="User ID"
+              value={formData.id}
+              onChange={handleInputChange}
+              required
+              readOnly
+            />
+          </div>
+
           <div className="form-group">
             <input
               type="text"

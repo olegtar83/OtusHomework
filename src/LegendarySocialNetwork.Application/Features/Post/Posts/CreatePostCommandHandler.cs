@@ -12,16 +12,19 @@ namespace LegendarySocialNetwork.Application.Features.Post.Posts
         private readonly IPostRepository _postRepository;
         private readonly IFriendshipRepository _friendshipRepository;
         private readonly ICurrentUserService _currentUserService;
+        private readonly IUserRepository _userRepository;
         private readonly IPublisher _publisher;
 
         public CreatePostCommandHandler(IPostRepository postRepository,
             IFriendshipRepository friendshipRepository,
             ICurrentUserService currentUserService,
+            IUserRepository userRepository,
             IPublisher publisher)
         {
             _currentUserService = currentUserService;
             _postRepository = postRepository;
             _friendshipRepository = friendshipRepository;
+            _userRepository = userRepository;
             _publisher = publisher;
         }
         public async Task<Result<Unit>> Handle(CreatePostCommandRequest request, CancellationToken cancellationToken)
@@ -38,7 +41,8 @@ namespace LegendarySocialNetwork.Application.Features.Post.Posts
                 Id = postId.Value,
                 Text = request.Text,
                 UserId = userId,
-                Created = DateTime.UtcNow
+                Created = DateTime.UtcNow,
+                Name = _currentUserService.GetUserName
             };
 
             var updateFeedMessage = new Domain.Messages.UpdateFeedMessage

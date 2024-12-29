@@ -29,7 +29,7 @@ namespace LegendarySocialNetwork.Infrastructure.Repositories
             IEnumerable<UserEntity> items;
             if (!string.IsNullOrEmpty(firstName) && !string.IsNullOrEmpty(lastName))
             {
-                sql += "WHERE first_name LIKE @firstname AND second_name LIKE @secondname ORDER BY id;";
+                sql += "WHERE first_name ILIKE @firstname AND second_name ILIKE @secondname ORDER BY id;";
                 items = con.Query<UserEntity>(sql, new
                 {
                     @firstname = $"{firstName}%",
@@ -38,7 +38,7 @@ namespace LegendarySocialNetwork.Infrastructure.Repositories
             }
             else if (!string.IsNullOrEmpty(firstName))
             {
-                sql += "WHERE first_name LIKE @firstname ORDER BY id;";
+                sql += "WHERE first_name ILIKE @firstname ORDER BY id;";
                 items = await con.QueryAsync<UserEntity>(sql, new
                 {
                     @firstname = $"{firstName}%"
@@ -57,7 +57,7 @@ namespace LegendarySocialNetwork.Infrastructure.Repositories
                 firstName = RandomNames.GetRandomFirstName();
                 lastName = RandomNames.GetRandomSecondName();
 
-                sql += "WHERE first_name LIKE @firstname AND second_name LIKE @secondname ORDER BY id;";
+                sql += "WHERE first_name ILIKE @firstname AND second_name ILIKE @secondname ORDER BY id;";
                 items = await con.QueryAsync<UserEntity>(sql, new
                 {
                     firstname = $"{firstName}%",

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Header from '../components/Header';
 import '../styles/User.css';
+import { HubConnectionBuilder } from '@microsoft/signalr';
 
 interface UserData {
   id: string;
@@ -22,7 +23,8 @@ const User = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch(`http://localhost:7888/user/get/${id}`, {
+        debugger;
+        const response = await fetch(`http://localhost:7888/api/user/get/${id}`, {
           headers: {
             'Accept': '*/*',
             'Authorization': `Bearer ${token}`
@@ -36,7 +38,6 @@ const User = () => {
         const data = await response.json();
         setUserData(data);
       } catch (err) {
-        console.error('Error:', err);
         setError(err instanceof Error ? err.message : 'Failed to load user data');
       }
     };

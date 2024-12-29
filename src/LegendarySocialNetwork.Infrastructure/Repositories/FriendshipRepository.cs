@@ -59,7 +59,7 @@ namespace LegendarySocialNetwork.Infrastructure.Repositories
         public async Task<Result<List<FriendEntity>>> GetFriendsAsync(string user_id)
         {
             await using var con = await _readDb.OpenConnectionAsync();
-            var sql = @"SELECT 
+            var sql = @"SELECT DISTINCT
                 u.id, 
                 (u.first_name || ' ' || u.second_name) AS name, 
                 u.city

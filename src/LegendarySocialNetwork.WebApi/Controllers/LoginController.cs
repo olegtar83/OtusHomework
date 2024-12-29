@@ -18,7 +18,7 @@ public class LoginController : ApiControllerBase
         _pass = pass;
     }
     [AllowAnonymous]
-    [HttpPost("[action]")]
+    [HttpPost]
     public async Task<IActionResult> Login([FromBody] LoginUserQueryRequest request)
     {
         var result = await Mediator.Send(request);
@@ -28,7 +28,8 @@ public class LoginController : ApiControllerBase
             if (isPasswordOk)
             {
                 var claims = new List<Claim> {
-                   new Claim(ClaimTypes.NameIdentifier, result.Value.Id)
+                   new Claim(ClaimTypes.NameIdentifier, result.Value.Id),
+                   new Claim(ClaimTypes.Name, result.Value.Name)
                 };
 
                 var jwt = JwtHelper.GenerateJWToken(claims);

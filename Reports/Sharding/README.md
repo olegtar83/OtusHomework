@@ -2,7 +2,7 @@
 
 Выбранная стратегия - для того чтобы избежать эффекта Лейди Гага, при котором один пользователь имеет очень большое количество чатов и тем самым перегружает выбранные шарды, принято решение использовать шардинированный ключ который создается на основе сочетания двух участников чата. Таким образом, если человек становится популярным и получает множество сообщений от разных собеседников, чаты будут распределяться равномерно по шардовым кластерам.
 
-1) Создается таблицу после запуска приложения
+1) Создается таблица после запуска приложения
 ```
 CREATE TABLE IF NOT EXISTS messages (
        id int generated always as identity,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS messages (
    в новый сервис сообщений `http://localhost:7887/swagger/index.html`, авторизировать с токеном и начать слать сообщения c
    рандомным юзером `62189e29-d6cd-4296-9dc2-c345512a3204`.
 
-4) Сделать запрос на сообщения по тому же юзеру -
+4) Сделать запрос на сообщения по тому же юзеру, видим что все сообщения имеют одинаковый shardId, значит находятся на одном шарде -
 ```
 select * from public.messages where "to" = '5e0db4db-c206-4edc-84c7-5b159030c767';
 ```
@@ -33,7 +33,7 @@ select * from public.messages where "to" = '5e0db4db-c206-4edc-84c7-5b159030c767
   2 | kjkj   | 6d9d6850-496c-49b0-9d31-c5d01fa0eeee | 5e0db4db-c206-4edc-84c7-5b159030c767 |      21
   3 | biubui | 6d9d6850-496c-49b0-9d31-c5d01fa0eeee | 5e0db4db-c206-4edc-84c7-5b159030c767 |      21
 ```
-5) Теперь сделать тот же запрос с `explain analyze`
+5) Теперь сделать тот же запрос с `explain analyze`, запрос отработал с одного шарда `messages_102026`
 ```
 Custom Scan (Citus Adaptive)  (cost=0.00..0.00 rows=100000 width=104) (actual time=39.928..39.929 rows=3 loops=1)
    Task Count: 32
@@ -60,6 +60,8 @@ set POSTGRES_PASSWORD=pass && docker-compose -p citus up --scale worker=5 -d
 SELECT master_get_active_worker_nodes();
 SELECT nodename, count(*) FROM citus_shards GROUP BY nodename;
 ```
+![first](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Sharding/first.png)
+
 3) Переходим в psql и меняем wal_level
 ```
 alter system set wal_level = logical;

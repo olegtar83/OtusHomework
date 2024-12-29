@@ -10,7 +10,7 @@ Redis был выбран по нескольким причинам, он уж�
 
 Был разработан следующий алгоритм
 
- ![diagram](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Queues/Diagram.png)    
+ ![diagram](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Queues/diagram.png)    
 
  
 1) Для проверки нужно зайти на веб приложения с двух браузеров `http://localhost:3000/` и зарегистрировать 2 разных пользователя.
@@ -24,4 +24,4 @@ Redis был выбран по нескольким причинам, он уж�
 
 4) и проверить что работает как в демо
 
- ![demo](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Queues/Recording 2024-12-29 120239.mp4)    
+ [Watch Demo Video](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Queues/demo.mp4)   

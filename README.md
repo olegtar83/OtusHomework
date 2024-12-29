@@ -6,6 +6,7 @@
 * Kafka
 * Dapper (Raw Sql)
 * Redis
+* React
 
 Инструкция по запуску:
 ```

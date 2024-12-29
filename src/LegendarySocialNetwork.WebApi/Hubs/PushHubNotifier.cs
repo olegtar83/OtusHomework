@@ -16,7 +16,6 @@ namespace LegendarySocialNetwork.WebApi.Hubs
         private readonly IHubContext<FeedHub, IFeedClient> _hubContext;
         private readonly IRedisCacheClient _redisCacheClient;
         private readonly IMapper _mapper;
-        private readonly ConcurrentBag<Guid> _sentMessages = new ConcurrentBag<Guid>();
 
         public PushHubNotifier(ILogger<PushHubNotifier> logger,
             IHubContext<FeedHub, IFeedClient> hubContext,
@@ -55,25 +54,18 @@ namespace LegendarySocialNetwork.WebApi.Hubs
 
             var userId = pushObject!.TargetedUserId;
 
-            if (!_sentMessages.Contains(pushObject.MessageId))
-            {
-                await _hubContext.Clients.User(userId)
-                   .PushToFeed(pushObject.Post);
-
-                _sentMessages.Add(pushObject.MessageId);
-            }
+            await _hubContext.Clients.User(userId)
+                .PushToFeed(pushObject.Post);
         }
 
         public async Task PublishAsync(PostMessage meesage, string userId)
         {
             _logger.LogInformation($"Pushing post to user -{userId}");
 
-            var messageId = Guid.NewGuid();
             var updateDto = new PostPushToFeedDTO
             {
                 Post = _mapper.Map<PostDto>(meesage),
                 TargetedUserId = userId,
-                MessageId = messageId
             };
 
             var message = JsonSerializer.Serialize(updateDto);

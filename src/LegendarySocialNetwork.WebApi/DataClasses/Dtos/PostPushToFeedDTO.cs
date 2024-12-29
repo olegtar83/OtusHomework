@@ -4,7 +4,5 @@
     {
         public required string TargetedUserId { get; set; }
         public required PostDto Post { get; set; }
-
-        public required Guid MessageId { get; set; }
     }
 }

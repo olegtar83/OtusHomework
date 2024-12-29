@@ -1,5 +1,6 @@
 import { type FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from "jwt-decode";
 
 interface LoginResponse {
   token: string;
@@ -33,7 +34,7 @@ const Login: FC = () => {
     setError('');
 
     try {
-      const loginResponse = await fetch('http://localhost:7888/login', {
+      const loginResponse = await fetch('http://localhost:7888/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -50,8 +51,13 @@ const Login: FC = () => {
       localStorage.setItem('token', data.token);
       localStorage.setItem('userId', formData.id);
       
+      // Decode the JWT token to get user information
+      const decodedToken: any = jwtDecode(data.token);
+      const userName = decodedToken['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name']; // Adjust this based on your token structure
+      localStorage.setItem('userName', userName); // Store the user's name in local storage
+      debugger;
       // Fetch user data
-      const userResponse = await fetch(`http://localhost:7888/user/get/${formData.id}`, {
+      const userResponse = await fetch(`http://localhost:7888/api/user/get/${formData.id}`, {
         headers: {
           'accept': '*/*',
           'Authorization': `Bearer ${data.token}`

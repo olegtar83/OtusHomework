@@ -21,7 +21,7 @@ namespace LegendarySocialNetwork.Application.Features.Auth.Register
                 Biography = request.Biography,
                 City = request.City,
                 First_name = request.First_name,
-                Id = Guid.NewGuid().ToString(),
+                Id = request.Id,
                 Second_name = request.Second_name,
                 Sex = request.Sex
             }, request.Password);

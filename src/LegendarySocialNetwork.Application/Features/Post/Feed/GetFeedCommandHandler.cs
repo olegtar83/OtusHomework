@@ -7,7 +7,6 @@ namespace LegendarySocialNetwork.Application.Features.Post.Feed
 {
     public record GetFeedCommandRequest(string? id) : IRequest<Result<List<PostEntity>>>;
 
-
     public record GetFeedCommandRequestHandler : IRequestHandler<GetFeedCommandRequest, Result<List<PostEntity>>>
     {
         private readonly IFeedRepository _feedRepository;

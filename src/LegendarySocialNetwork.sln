@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EE56E72B-F61C-491E-8662-A4AB6E9E30D5}"
 	ProjectSection(SolutionItems) = preProject
 		..\docker-compose-replica.yml = ..\docker-compose-replica.yml
+		..\docker-compose-sharding.yml = ..\docker-compose-sharding.yml
 		..\docker-compose.yml = ..\docker-compose.yml
 		global.json = global.json
 	EndProjectSection
@@ -18,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LegendarySocialNetwork.WebA
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LegendarySocialNetwork.Application", "LegendarySocialNetwork.Application\LegendarySocialNetwork.Application.csproj", "{EE3EABAF-97DA-4071-9BE4-300324350BF2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LegendarySocialNetwork.Messages", "LegendarySocialNetwork.Messages\LegendarySocialNetwork.Messages.csproj", "{4DAA7D89-0336-4C38-9FD8-C83C67017C2F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LegendarySocialNetwork.Messages", "LegendarySocialNetwork.Messages\LegendarySocialNetwork.Messages.csproj", "{4DAA7D89-0336-4C38-9FD8-C83C67017C2F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

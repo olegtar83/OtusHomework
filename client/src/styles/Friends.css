@@ -1,0 +1,59 @@
+.friends-list {
+  list-style-type: none; /* Remove default list styling */
+  padding: 0; /* Remove padding */
+  margin: 20px 0; /* Add margin for spacing */
+}
+
+.friend-item {
+  background-color: #f9f9f9; /* Light background for each friend */
+  border: 1px solid #ddd; /* Light border */
+  border-radius: 5px; /* Rounded corners */
+  padding: 10px; /* Padding for compactness */
+  margin-bottom: 10px; /* Space between items */
+  display: flex; /* Flexbox for layout */
+  flex-direction: column; /* Stack items vertically */
+  transition: background-color 0.3s; /* Smooth background color transition */
+}
+
+.friend-item:hover {
+  background-color: #e0e0e0; /* Change background on hover */
+}
+
+.friend-image {
+  width: 40px; /* Set width for the image */
+  height: 40px; /* Set height for the image */
+  border-radius: 50%; /* Make the image circular */
+  margin-bottom: 8px; /* Space below the image */
+}
+
+.friend-details {
+  margin-bottom: 8px; /* Space below the details */
+}
+
+.friend-name {
+  font-weight: bold; /* Bold font for names */
+}
+
+.friend-city {
+  color: #555; /* Darker color for city */
+}
+
+.friend-button-container {
+  display: flex; /* Flexbox for button layout */
+  justify-content: flex-start; /* Align buttons to the left */
+  gap: 10px; /* Space between buttons */
+}
+
+.friend-request-button {
+  background-color: #007bff; /* Button color */
+  color: white; /* Text color */
+  border: none; /* Remove border */
+  border-radius: 4px; /* Rounded corners */
+  padding: 6px 10px; /* Padding for button */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s; /* Smooth background color transition */
+}
+
+.friend-request-button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+} 

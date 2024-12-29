@@ -69,7 +69,9 @@ namespace LegendarySocialNetwork.Infrastructure.Repositories
         public async Task<Result<PostEntity>> GetAsync(string postId)
         {
             await using var con = await _readDb.OpenConnectionAsync();
-            var sql = "SELECT id, user_id, text, created, updated FROM public.\"post\" WHERE id = @postId LIMIT 1;;";
+            var sql = @"SELECT (u.first_name || ' ' || u.second_name) AS name, p.id, p.user_id, p.text, p.created, p.updated FROM public.post as p
+                      inner join public.""user"" as u on p.user_id = u.id
+                      WHERE p.id = @postId LIMIT 1;";
             var item = await con.QueryFirstAsync<PostEntity>(sql, new { postId });
             if (item is not null) { return Result<PostEntity>.Success(item); }
             return Result<PostEntity>.Failure("Not found");
@@ -78,10 +80,12 @@ namespace LegendarySocialNetwork.Infrastructure.Repositories
         public async Task<Result<List<PostEntity>>> GetLimitedFeedAsync(string user_id, int? limit = 1000)
         {
             await using var con = await _readDb.OpenConnectionAsync();
-            var sql = @"SELECT id, user_id, text, created, updated FROM public.post
-                WHERE user_id in (SELECT addressed_id FROM public.friendship
+            var sql = @"SELECT(u.first_name || ' ' || u.second_name) AS name, 
+                p.id, p.user_id, p.text, p.created, p.updated FROM public.post as p       
+                inner join public.""user"" as u on p.user_id = u.id
+                WHERE p.user_id in (SELECT addressed_id FROM public.friendship
                 where requester_id = @user_id)
-				or user_id in (SELECT requester_id FROM public.friendship
+				or p.user_id in (SELECT requester_id FROM public.friendship
                 where addressed_id = @user_id)
                 LIMIT @limit";
             var items = await con.QueryAsync<PostEntity>(sql, new { user_id, limit });

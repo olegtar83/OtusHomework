@@ -17,5 +17,17 @@ namespace LegendarySocialNetwork.WebApi.Services
                     ?? string.Empty;
             }
         }
+
+        public string GetUserName
+        {
+            get
+            {
+                if (_httpContextAccessor.HttpContext == null)
+                    return string.Empty;
+
+                return _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name)
+                    ?? string.Empty;
+            }
+        }
     }
 }

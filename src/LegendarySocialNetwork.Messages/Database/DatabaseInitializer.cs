@@ -25,13 +25,12 @@ namespace LegendarySocialNetwork.Messages.Database
 
                 await dbConnection.ExecuteAsync(sqlScript);
 
-                string sqlScript1 = @"CREATE EXTENSION IF NOT EXISTS citus;";
-
-                await dbConnection.ExecuteAsync(sqlScript1);
-
-
                 try
                 {
+                    string sqlScript1 = @"CREATE EXTENSION IF NOT EXISTS citus;";
+
+                    await dbConnection.ExecuteAsync(sqlScript1);
+
                     string sqlScript2 = @"SELECT create_distributed_table('messages', 'shardId');";
 
                     await dbConnection.ExecuteAsync(sqlScript2);

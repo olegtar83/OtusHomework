@@ -1,15 +1,17 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import User from './pages/User';
 import Feed from './pages/Feed';
+import Friends from './pages/Friends';
 import './App.css';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
   const userId = localStorage.getItem('userId');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -19,7 +21,8 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       }
 
       try {
-        const response = await fetch(`http://localhost:7888/user/get/${userId}`, {
+        debugger;
+        const response = await fetch(`http://localhost:7888/api/user/get/${userId}`, {
           headers: {
             'accept': '*/*',
             'Authorization': `Bearer ${token}`
@@ -34,13 +37,20 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
           navigate('/login');
         }
       } catch (error) {
+        console.error('Error fetching user data:', error);
         localStorage.clear();
         navigate('/login');
+      } finally {
+        setLoading(false);
       }
     };
 
     checkAuth();
   }, [navigate, token, userId]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return <>{children}</>;
 };
@@ -67,6 +77,7 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route path="/friends" element={<Friends />} />
     </Routes>
   );
 }

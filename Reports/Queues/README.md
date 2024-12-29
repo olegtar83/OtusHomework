@@ -24,4 +24,4 @@ Redis был выбран по нескольким причинам, он уж�
 
 4) и проверить что работает как в демо
 
- ![demo](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Queues/demo.mp4)    
+ [Watch Demo Video](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Queues/demo.mp4)   

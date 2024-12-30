@@ -6,7 +6,7 @@
 * Kafka
 * Dapper (Raw Sql)
 * Redis
-* React
+* React - 18.3.1
 
 Инструкция по запуску:
 ```

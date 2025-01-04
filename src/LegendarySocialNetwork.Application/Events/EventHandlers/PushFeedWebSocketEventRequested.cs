@@ -22,7 +22,7 @@ namespace LegendarySocialNetwork.Application.Events.EventHandlers
                 await producer.Produce(notification.EventRequest, cancellationToken);
             }
             else
-                return;
+                await Task.CompletedTask;
         }
     }
 }

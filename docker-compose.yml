@@ -143,20 +143,51 @@ services:
     entrypoint: dotnet LegendarySocialNetwork.Messages.dll
     networks:
       - legendary-network
-  legendary-react-app:
+  tarantool: 
     build:
-      context: ./client
-      dockerfile: Dockerfile
-    container_name: legendary-react-app
+      context: .
+      dockerfile: Tarantool/Dockerfile
+    container_name: tarantool
+    hostname: tarantool
+    environment:
+      TARANTOOL_USER_NAME: tarantool
+      TARANTOOL_USER_PASSWORD: tarantool
+      PG_HOST: master-db
+      PG_USER: dbuser
+      PG_PASSWORD: dbpassword
+      PG_DATABASE: legendarydb
+      PG_PORT: 5432
+    volumes:
+      - tarantool-data:/var/lib/tarantool
+      - ./Tarantool:/usr/local/share/tarantool/init
+    command: tarantool /usr/local/share/tarantool/init/init.lua
     ports:
-      - 3000:80
+        - 3301:3301
     networks:
-      - legendary-network  
+      - legendary-network
+  tarantool-admin:
+    image: quay.io/basis-company/tarantool-admin
+    container_name: tarantool-admin
+    hostname: tarantool-admin
+    ports: 
+        - 8000:80
+    networks:
+      - legendary-network
+  # legendary-react-app:
+  #   build:
+  #     context: ./client
+  #     dockerfile: Dockerfile
+  #   container_name: legendary-react-app
+  #   ports:
+  #     - 3000:80
+  #   networks:
+  #     - legendary-network  
 volumes:
   kafka-data:
   healthcheck-volume:
   redis-data:
   postgres-data:
+  tarantool-data:
 networks:
   legendary-network:
     driver: bridge

@@ -20,8 +20,8 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - ./Postgres/master_postgresql.conf:/etc/postgresql/postgresql.conf
-      - ./Postgres/master_pg_hba.conf:/etc/postgresql/pg_hba.conf
+      - ./Postgres/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./Postgres/pg_hba.conf:/etc/postgresql/pg_hba.conf
       - ./Postgres:/docker-entrypoint-initdb.d # Инициализация таблиц
       - postgres-data:/var/lib/postgresql/data
     networks:

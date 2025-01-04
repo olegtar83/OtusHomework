@@ -24,7 +24,7 @@ local function init()
     box.schema.user.create('tarantool', {password = 'tarantool', if_not_exists = true})
     box.schema.user.grant('tarantool', 'read,write,execute', 'universe', nil, { if_not_exists = true })
 
-    box.schema.space.create('messages', { if_not_exists = true, temporary = true })
+    box.schema.space.create('messages', { if_not_exists = true })
 
     -- Primary key definition (assuming 'id' as primary key)
     box.space.messages:format({
@@ -59,14 +59,12 @@ local function init()
 end
 
 function sync()
-    --log.info('Starting replication...')
     local fiber = require('fiber')
     local status, pg_conn = driver.connect(conn_str)
     
     if status < 0 then
         log.info(pg_conn)
     else
-        --log.info("Connected")
         local at_least_one_message = box.space.messages:select({}, { limit = 1 })
         local max_id = 0
 
@@ -79,20 +77,17 @@ function sync()
                 log.error("Error retrieving max id: %s", max_message)
             else
                 max_id = max_message and max_message[1] or 0
-                ---log.info("Max ID in Tarantool messages %s:", max_id)
             end
         else
             log.info("No records found, max ID defaulting to 0")
         end
 
         local query = string.format("SELECT id, \"from\", \"to\", text FROM public.messages WHERE id > %d ORDER BY id", max_id)
-        --log.info(string.format("Postgres Query: %s", query))
         local status, result = pg_conn:execute(query)
 
         if status < 0 then
             log.info(result)
         else
-            --log.info("Start processing %s", #result[1])
 
             local messages = result[1]
             local total_count = 0
@@ -112,55 +107,22 @@ function sync()
                 }
 
                 local ok, err = pcall(function()
-                    --log.info("Inserting: %s", id)
                     box.space.messages:insert(message_entry)
                     fiber.yield()
                 end)
                 
                 if not ok then
-                    --log.error("Error inserting: %s. %s", id, err)
+                    log.error("Error inserting: %s. %s", id, err)
                 end
 
                 total_count = total_count + 1
             end
 
             pg_conn:close()
-            --log.info("Loaded: %s", total_count)
             return total_count -- Return the count variable appropriately
         end
     end
 end
-
-function select_messages(param)
-    local results = {}
-    local index_key = { param }
-    local from_results, from_err = pcall(function()
-        return box.space.messages.index.from_index:select(index_key, {iterator = box.index.EQ})
-    end)
-  
-    if not from_results then
-        log.error("Error querying from_index with param '%s': %s", param, from_err)
-    else
-        log.info("From Result %s", from_results)
-        for _, tuple in ipairs(from_results) do
-            table.insert(results, tuple)
-        end
-    end
-  
-    local to_results, to_err = pcall(function()
-        return box.space.messages.index.to_index:select(index_key, {iterator = box.index.EQ})
-    end)
-  
-    if not to_results then
-        log.error("Error querying to_index with param '%s': %s", param, to_err)
-    else
-        for _, tuple in ipairs(to_results) do
-            table.insert(results, tuple)
-        end
-    end
-  
-    return results
-  end
 
 box.once('init', init)
 log.info("Script ended")

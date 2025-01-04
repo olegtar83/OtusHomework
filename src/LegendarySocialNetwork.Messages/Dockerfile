@@ -7,7 +7,7 @@ EXPOSE 8080
 EXPOSE 8081
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
+ARG BUILD_CONFIGURATION=Debug
 WORKDIR /src
 COPY ["LegendarySocialNetwork.Messages/LegendarySocialNetwork.Messages.csproj", "LegendarySocialNetwork.Messages/"]
 RUN dotnet restore "./LegendarySocialNetwork.Messages/./LegendarySocialNetwork.Messages.csproj"
@@ -16,7 +16,7 @@ WORKDIR "/src/LegendarySocialNetwork.Messages"
 RUN dotnet build "./LegendarySocialNetwork.Messages.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
+ARG BUILD_CONFIGURATION=Debug
 RUN dotnet publish "./LegendarySocialNetwork.Messages.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final

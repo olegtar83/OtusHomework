@@ -4,24 +4,23 @@ services:
   master-db:
     image: postgres:14
     container_name: master-db
+    hostname: master-db
     environment:
       POSTGRES_DB: "legendarydb"
       POSTGRES_USER: "dbuser"
       POSTGRES_PASSWORD: "dbpassword"
-    command: [
-      "postgres", 
-      "-c", 
-      "config_file=/etc/postgresql/postgresql.conf",
-      "-c", 
-      "hba_file=/etc/postgresql/pg_hba.conf"
-      ]
+    # command: [
+    #   "postgres", 
+    #   "-c", 
+    #   "config_file=/etc/postgresql/postgresql.conf",
+    #   "-c", 
+    #   "hba_file=/etc/postgresql/pg_hba.conf"
+    #   ]
     mem_limit: 2048m
     shm_size: 1gb 
     ports:
       - 5432:5432
     volumes:
-      - ./Postgres/postgresql.conf:/etc/postgresql/postgresql.conf
-      - ./Postgres/pg_hba.conf:/etc/postgresql/pg_hba.conf
       - ./Postgres:/docker-entrypoint-initdb.d # Инициализация таблиц
       - postgres-data:/var/lib/postgresql/data
     networks:
@@ -131,6 +130,7 @@ services:
       AllowedHosts: "*" 
       DatabaseSettings:CitusConnStr: "Host=master-db;Port=5432;Username=dbuser;Password=dbpassword;Database=legendarydb;Pooling=true;Maximum Pool Size=950;Minimum Pool Size=200;Timeout=300;CommandTimeout=300;Connection Idle Lifetime=300;Connection Pruning Interval=10;Keepalive=60;TCP Keepalive Time=60;TCP Keepalive Interval=10"
       DatabaseSettings:ShardsNode: 16
+      Tarantool:ConnStr: tarantool:tarantool@tarantool:3301
       JWTSettings:Key: "superSecretKey@34512312312312312"
       JWTSettings:Issuer: legendary.social.network
       JWTSettings:Audience: legendary.social.network
@@ -163,6 +163,9 @@ services:
     command: tarantool /usr/local/share/tarantool/init/init.lua
     ports:
         - 3301:3301
+    depends_on:
+       master-db:
+          condition: service_healthy
     networks:
       - legendary-network
   tarantool-admin:

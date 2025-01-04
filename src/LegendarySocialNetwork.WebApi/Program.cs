@@ -10,6 +10,7 @@ using LegendarySocialNetwork.WebApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using StackExchange.Redis;
 using System.Reflection;
 using System.Text;
 
@@ -43,7 +44,10 @@ builder.Services.AddCors(options =>
 builder.Services.AddSignalR(options =>
 {
     options.EnableDetailedErrors = true;
-});
+})
+    .AddStackExchangeRedis(Environment.GetEnvironmentVariable("Redis:ConnectionString")!,
+opt => opt.Configuration.ChannelPrefix = RedisChannel.Literal("signalR-"));
+
 builder.Services.AddHttpContextAccessor();
 
 

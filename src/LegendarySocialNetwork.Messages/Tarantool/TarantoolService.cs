@@ -54,7 +54,7 @@ namespace LegendarySocialNetwork.Messages.Tarantool
         {
             var resFrom = await secondaryIndexFrom.Select<TarantoolTuple<string>, MessageTar>(TarantoolTuple.Create(userId), new SelectOptions { Iterator = Iterator.Eq });
 
-            var resTo = await secondaryIndexTo.Select<TarantoolTuple<string>, MessageTar>(TarantoolTuple.Create(userId), new SelectOptions { Iterator = Iterator.Eq }); ;
+            var resTo = await secondaryIndexTo.Select<TarantoolTuple<string>, MessageTar>(TarantoolTuple.Create(userId), new SelectOptions { Iterator = Iterator.Eq });
 
             if(resFrom.Data == null && resTo.Data == null)
             {

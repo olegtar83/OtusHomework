@@ -1,6 +1,7 @@
 ﻿using LegendarySocialNetwork.Messages.Database;
 using LegendarySocialNetwork.Messages.DataClasses.Models;
 using LegendarySocialNetwork.Messages.DataClasses.Responses;
+using LegendarySocialNetwork.Messages.Tarantool;
 
 namespace LegendarySocialNetwork.Messages.Services
 {
@@ -13,9 +14,12 @@ namespace LegendarySocialNetwork.Messages.Services
     public class DialogService : IDialogService
     {
         private readonly IDatabaseContext _databaseContext;
-        public DialogService(IDatabaseContext databaseContext)
+        private readonly ITarantoolService _tarantoolService;
+        public DialogService(IDatabaseContext databaseContext,
+            ITarantoolService tarantoolService)
         {
             _databaseContext = databaseContext;
+            _tarantoolService = tarantoolService;
         }
 
         public async Task<Result<string>> SetDialogAsync(string from, string text, string to)
@@ -26,7 +30,8 @@ namespace LegendarySocialNetwork.Messages.Services
 
         public async Task<Result<List<DialogResp>>> GetDialogsAsync(string userId)
         {
-            var res = await _databaseContext.GetDialogsAsync(userId);
+            //var res = await _databaseContext.GetDialogsAsync(userId);
+            var res = await _tarantoolService.GetDialogsAsync(userId);
             if (res.Succeeded)
             {
                 var dialogs = res.Value.Select(x => new DialogResp

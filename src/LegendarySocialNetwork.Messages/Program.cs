@@ -2,6 +2,8 @@ using LegendarySocialNetwork.Messages.Database;
 using LegendarySocialNetwork.Messages.Filters;
 using LegendarySocialNetwork.Messages.Middlewares;
 using LegendarySocialNetwork.Messages.Services;
+using LegendarySocialNetwork.Messages.Tarantool;
+using LegendarySocialNetwork.Messages.Tarantool.HostedService;
 using LegendarySocialNetwork.Messages.Utilities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -54,6 +56,8 @@ config.GetSection(nameof(DatabaseSettings)).Bind(HashUtility.DbSettings);
 config.GetSection(nameof(DatabaseSettings)).Bind(DatabaseInitializer.DbSetting);
 builder.Services.AddScoped<IDatabaseContext, DatabaseContext>();
 builder.Services.AddTransient<IDialogService, DialogService>();
+builder.Services.AddTransient<ITarantoolService,  TarantoolService>();
+builder.Services.AddHostedService<TarantoolReplicatorService>();
 
 builder.Services.AddSwaggerGen(c =>
 {

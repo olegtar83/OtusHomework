@@ -18,7 +18,7 @@
 2) Смотрим ее в админке тарантула
 ![replica](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Tarantool/tarantool-replicator.png)
 
-3) Теперь делаем замеры на 1000 запросов `http://localhost:7887/api/Dialog/d1743302-2943-418b-99fd-cac5cb5ac224/List`
+3) Теперь делаем замеры на 1000 запросов `http://localhost:7887/api/Dialog/d1743302-2943-418b-99fd-cac5cb5ac224/List` по поиску диалога в Postgres.
 ![postgres](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Tarantool/postgres-dialog.png)
 Запрос получился очень тяжелым поэтому сервер не выдержал нагрузку даже при индексации запросов.
 

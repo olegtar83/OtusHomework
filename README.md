@@ -1,7 +1,10 @@
 ## Otus Highload.LegendarySocialNetwork
+![GitHub repo size](https://img.shields.io/github/repo-size/olegtar83/OtusHomework?style=plastic)
+![GitHub language count](https://img.shields.io/github/languages/count/olegtar83/OtusHomework?style=plastic)
+![GitHub top language](https://img.shields.io/github/languages/top/olegtar83/OtusHomework?style=plastic) 
+![GitHub last commit](https://img.shields.io/github/last-commit/olegtar83/OtusHomework?color=red&style=plastic)
 
 Проект состоит из:
-* C#
 * PostgreSQL
 * Kafka
 * Dapper (Raw Sql)

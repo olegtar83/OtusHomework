@@ -15,7 +15,7 @@
 1) Для проверки добавляем одну запись в Postgres.
 ![add-postgres](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Tarantool/insert-postgres.png)
 
-2) Смотрим ее в админке тарантула
+2) Смотрим ее в админке тарантула, репликация прошла успешно
 ![replica](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Tarantool/tarantool-replicator.png)
 
 3) Теперь делаем замеры на 1000 запросов `http://localhost:7887/api/Dialog/d1743302-2943-418b-99fd-cac5cb5ac224/List` по поиску диалога в Postgres.

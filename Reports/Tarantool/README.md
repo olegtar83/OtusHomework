@@ -12,13 +12,13 @@
 
 Конфигурация Tarantool прописана в файле lua, так же были созданы два поисковых индекса и прописаны там же. Однако при вызове дополнительной функции из этого файла lua для поиска по индексам, результаты не находились, что привело к решению обращаться к индексам поиска через драйвер для удобства.
 
-1) Изначально заполняем Postgres на 899799 строчек рандомных данных, все они скопируются в Tarantool.
+1) Изначально заполняем Postgres на 899979 строчек рандомных данных, все они скопируются в Tarantool.
 ![rows](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Tarantool/rows_in_postgres.png)
 
 2) Для проверки добавляем одну запись в Postgres.
 ![add-postgres](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Tarantool/insert-postgres.png)
 
-3) Смотрим ее в админке тарантула, репликация прошла успешно
+3) Смотрим ее в админке тарантула, репликация произошла успешно
 ![replica](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Tarantool/tarantool-replicator.png)
 
 4) Теперь делаем замеры на 1000 запросов `http://localhost:7887/api/Dialog/d1743302-2943-418b-99fd-cac5cb5ac224/List` по поиску диалога в Postgres.

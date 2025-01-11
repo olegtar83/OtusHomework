@@ -56,7 +56,7 @@ config.GetSection(nameof(DatabaseSettings)).Bind(HashUtility.DbSettings);
 config.GetSection(nameof(DatabaseSettings)).Bind(DatabaseInitializer.DbSetting);
 builder.Services.AddScoped<IDatabaseContext, DatabaseContext>();
 builder.Services.AddTransient<IDialogService, DialogService>();
-builder.Services.AddTransient<ITarantoolService,  TarantoolService>();
+builder.Services.AddSingleton<ITarantoolService,  TarantoolService>();
 builder.Services.AddHostedService<TarantoolReplicatorService>();
 
 builder.Services.AddSwaggerGen(c =>

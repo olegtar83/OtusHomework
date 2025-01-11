@@ -6,7 +6,7 @@
 * Lua
 * progaudi.tarantool
 
-Был разработан следующий алгоритм действий: данные записываются в PostgreSQL; сервиc репликатор, написанный на Lua, сравнивает, если она больше максимального id в Tarantool то он оносуществляет копирование записи в Tarantool.
+Был разработан следующий алгоритм действий: данные записываются в PostgreSQL; сервиc репликатор, написанный на Lua, сравнивает, если id в Postgres больше максимального id в Tarantool то он оносуществляет копирование записи в Tarantool.
 
 ![diagram](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Tarantool/tarantool-diagram.png)
 

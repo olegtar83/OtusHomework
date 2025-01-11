@@ -18,3 +18,6 @@ docker-compose up -d --build
 ```
 
 [#Задачи](https://github.com/olegtar83/OtusHomework/tree/master/Reports)
+
+
+![](https://api.visitorbadge.io/api/VisitorHit?user=estruyf&repo=github-visitors-badge&countColor=%237B1E7A)

@@ -9,19 +9,14 @@ services:
       POSTGRES_DB: "legendarydb"
       POSTGRES_USER: "dbuser"
       POSTGRES_PASSWORD: "dbpassword"
-    # command: [
-    #   "postgres", 
-    #   "-c", 
-    #   "config_file=/etc/postgresql/postgresql.conf",
-    #   "-c", 
-    #   "hba_file=/etc/postgresql/pg_hba.conf"
-    #   ]
-    mem_limit: 2048m
-    shm_size: 1gb 
+    command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
+    mem_limit: 2gb
+    shm_size: 2gb 
     ports:
       - 5432:5432
     volumes:
       - ./Postgres:/docker-entrypoint-initdb.d # Инициализация таблиц
+      - ./Postgres/postgresql.conf:/etc/postgresql/postgresql.conf
       - postgres-data:/var/lib/postgresql/data
     networks:
       - legendary-network
@@ -128,7 +123,7 @@ services:
       # Основные настройки для работы API
       ASPNETCORE_URLS: "http://+:80"
       AllowedHosts: "*" 
-      DatabaseSettings:CitusConnStr: "Host=master-db;Port=5432;Username=dbuser;Password=dbpassword;Database=legendarydb;Pooling=true;Maximum Pool Size=950;Minimum Pool Size=200;Timeout=300;CommandTimeout=300;Connection Idle Lifetime=300;Connection Pruning Interval=10;Keepalive=60;TCP Keepalive Time=60;TCP Keepalive Interval=10"
+      DatabaseSettings:CitusConnStr: "Host=master-db;Port=5432;Username=dbuser;Password=dbpassword;Database=legendarydb;Pooling=true;Maximum Pool Size=1450;Minimum Pool Size=300;Timeout=600;CommandTimeout=600;Connection Idle Lifetime=300;Connection Pruning Interval=10;Keepalive=60;TCP Keepalive Time=60;TCP Keepalive Interval=10"
       DatabaseSettings:ShardsNode: 16
       Tarantool:ConnStr: tarantool:tarantool@tarantool:3301
       JWTSettings:Key: "superSecretKey@34512312312312312"
@@ -139,7 +134,7 @@ services:
     depends_on:
        master-db:
           condition: service_healthy
-    mem_limit: 1024m
+    mem_limit: 2048m
     entrypoint: dotnet LegendarySocialNetwork.Messages.dll
     networks:
       - legendary-network

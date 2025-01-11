@@ -30,7 +30,6 @@ namespace LegendarySocialNetwork.Messages.Services
 
         public async Task<Result<List<DialogResp>>> GetDialogsAsync(string userId)
         {
-            //var res = await _databaseContext.GetDialogsAsync(userId);
             var res = await _tarantoolService.GetDialogsAsync(userId);
             if (res.Succeeded)
             {

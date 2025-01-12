@@ -24,9 +24,9 @@
    ![feed](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Cache/get-posts.png)
  
 14. Фид будет браться из кеша поcкольку ключ `feed-67226925-f615-48c2-8fe6-a0f47e9f385f` существует в 
-  редисе.
-13. Инвалидация кеша  в случае обновление друзей или модификации, добавлении и удалении постов работает корректно после 
-  события в брокере сообщений.
-14. Также можно посмореть на происходящее в кафке ui:
+    редисе.
+13. Инвалидация кеша так же в случае обновление друзей или модификации, добавлении и удалении постов работает корректно 
+    после события в брокере сообщений.
+14. Также можно посмореть на события по инвалидации добавленые в топик `update-feed-posts`:
     
-   ![kafka](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Cache/kafka-cache.png)
+    ![kafka](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Cache/kafka-cache.png)

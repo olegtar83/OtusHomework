@@ -15,7 +15,7 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - ./Postgres:/docker-entrypoint-initdb.d # Инициализация таблиц
+      - ./Postgres/main:/docker-entrypoint-initdb.d # Инициализация таблиц
       - ./Postgres/postgresql.conf:/etc/postgresql/postgresql.conf
       - postgres-data:/var/lib/postgresql/data
     networks:

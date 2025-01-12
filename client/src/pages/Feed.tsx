@@ -18,6 +18,37 @@ const Feed = () => {
   const connectionRef = useRef<signalR.HubConnection | null>(null);
 
   useEffect(() => {
+    const fetchInitialPosts = async () => {
+      const token = localStorage.getItem('token');
+      const userId = localStorage.getItem('userId');
+      
+      try {
+        const response = await fetch(`http://localhost:7888/api/Post/Feed/${userId}`, {
+          headers: {
+            'accept': '*/*',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          // Sort posts by date, newest first
+          const sortedPosts = data.sort((a: Post, b: Post) => 
+            new Date(b.created).getTime() - new Date(a.created).getTime()
+          );
+          setPosts(sortedPosts);
+        } else {
+          console.error('Failed to fetch posts');
+        }
+      } catch (err) {
+        console.error('Error fetching posts:', err);
+      }
+    };
+
+    // First fetch initial posts
+    fetchInitialPosts();
+
+    // Then set up SignalR connection
     const connectToSignalR = async () => {
       if (connectionRef.current) {
         return;
@@ -45,7 +76,7 @@ const Feed = () => {
 
         connectionRef.current.on('PushToFeed', (post: Post) => {
           console.log('New post received:', post);
-          setPosts(prevPosts => [...prevPosts, post]);
+          setPosts(prevPosts => [post, ...prevPosts]);
         });
 
         await connectionRef.current.start();

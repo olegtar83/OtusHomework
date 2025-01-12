@@ -6,7 +6,7 @@ import '../styles/Friends.css';
 const Friends = () => {
   const location = useLocation();
   const { searchResults } = location.state || { searchResults: [] }; // Get search results from location state
-
+  const DEFAULT_AVATAR = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTEyIDEyYzIuMjEgMCA0LTEuNzkgNC00cy0xLjc5LTQtNC00LTQgMS43OS00IDQgMS43OSA0IDQgNHptMCAyYy0yLjY3IDAtOCAxLjM0LTggNHYyaDE2di0yYzAtMi42Ni01LjMzLTQtOC00eiIgZmlsbD0iI2FhYWFhYSIvPjwvc3ZnPg==';
   // State to track added friends
   const [addedFriends, setAddedFriends] = useState<{ [key: string]: boolean }>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -60,9 +60,9 @@ const Friends = () => {
           {searchResults.map((friend: any) => ( // Adjust type as necessary
             <li key={friend.id} className="friend-item"> {/* Apply the friend-item class */}
               <img 
-                src="https://via.placeholder.com/40" // Default image URL
-                alt={`${friend.first_name} ${friend.second_name}`} 
-                className="friend-image" // Apply the friend-image class
+                src={DEFAULT_AVATAR}
+                alt={friend.name}
+                className="friend-image"
               />
               <div className="friend-details"> {/* Container for friend details */}
                 <div><span className="friend-name">First Name: {friend.first_name}</span></div> {/* Display friend's first name */}

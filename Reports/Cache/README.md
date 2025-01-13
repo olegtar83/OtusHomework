@@ -17,7 +17,7 @@
 6. Смотрим в redis cli на наличие ключей подписаных друзей в формате feed-{userId}.
 
    ![redis1](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Cache/redis-keys.png)     
-7. Убираем юзера из друзей.
+7. Убираем одного юзера из друзей.
 8. Cмотрим на ключи в редисе, остается один ключ.
    ![redis2](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Cache/delete-friend-redis.png)     
 9. Добавляем еще один пост, и проверяем фид

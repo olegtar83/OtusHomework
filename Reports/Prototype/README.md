@@ -6,8 +6,14 @@
 0. Все состояние базы данных хранится в папке `volumes`. Для того, чтобы запустить с нуля и заново создать базу данных нужно удалить папку `rm -rf volumes`.
 1. Запускаем базу данных и API командой `docker-compose up -d`.
 2. Ждем когда Postgres запустится, перезагрузится, создадутся таблицы.
-3. Открываем `http://localhost:7888/swagger`, создаем нового пользователя `qwerty` с паролем `qwerty`. Запрос `Register`. Получаем id пользователя. (В тестовой базе пользователь уже создан)
-4. Логинимся с полученным id. Запрос `Login`. Получаем токен авторизации. Копируем его.
-5. Получаем информацию о пользователе. Запрос `Get user by id`. На вкладке `Authorization` выбираем `Type: Bearer Token`, в поле `Token` вставляем скопированный токен с шага 6. В строке с адресом запроса после `http://localhost:7888/user/get/` вставляем нужный id
-7. Можно перейти по адресу `http://localhost:3000`. Зарегистрироваться, разлогиниться, залогиниться, посмотреть профиль.
+3. Открываем `http://localhost:3000/register`, создаем нового пользователя.
+     
+![register](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Prototype/register.png)
 
+4.Выходим и логинимся с тем же id.
+
+![login](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Prototype/login.png)
+
+5. Для того что бы получить информацию о пользователе нужно перейти на страницу профиля.
+   
+![login](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Prototype/profile.png)

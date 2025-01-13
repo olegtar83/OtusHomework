@@ -75,7 +75,6 @@ const Register: FC = () => {
         const errorData = await registerResponse.json();
         throw new Error(errorData.message || 'Registration failed');
       }
-      debugger;
       const data = await registerResponse.json();
       
       // Store the JWT token

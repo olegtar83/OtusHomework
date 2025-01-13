@@ -23,7 +23,6 @@ const User = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        debugger;
         const response = await fetch(`http://localhost:7888/api/user/get/${id}`, {
           headers: {
             'Accept': '*/*',

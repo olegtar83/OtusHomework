@@ -21,7 +21,6 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       }
 
       try {
-        debugger;
         const response = await fetch(`http://localhost:7888/api/user/get/${userId}`, {
           headers: {
             'accept': '*/*',

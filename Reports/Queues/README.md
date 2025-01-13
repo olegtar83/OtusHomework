@@ -29,3 +29,7 @@ Redis был выбран по нескольким причинам:
 4) и проверить что работает как в демо
 
  ![demo](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Queues/demo.gif)   
+
+5) Так же можно увидеть процесс подписки\публикации в Redis.
+
+ ![redis](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Queues/redis-monitor.png) 

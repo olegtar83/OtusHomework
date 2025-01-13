@@ -4,7 +4,7 @@
    * Kafka - для отложенной обработки.
    * Redis - для храненния кэша.
    * MessagePack -для оптимизации сериализации и объема данных .
-2. Открываем `http://localhost:3000/register`, создаем нового пользователя `Michael Jordan` с паролем `string`. Запрос `Register`. Получаем id пользователя. (В тестовой базе пользователь уже создан)
+2. Открываем `http://localhost:3000/register`, создаем нового пользователя `Michael Jordan` с паролем `string`.
 3. Добавляем друзей
 
    ![friends](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Cache/add-friends.png)

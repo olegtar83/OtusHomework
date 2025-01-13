@@ -55,7 +55,6 @@ const Login: FC = () => {
       const decodedToken: any = jwtDecode(data.token);
       const userName = decodedToken['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name']; // Adjust this based on your token structure
       localStorage.setItem('userName', userName); // Store the user's name in local storage
-      debugger;
       // Fetch user data
       const userResponse = await fetch(`http://localhost:7888/api/user/get/${formData.id}`, {
         headers: {

@@ -19,5 +19,10 @@ docker-compose up -d --build
 
 [#Задачи](https://github.com/olegtar83/OtusHomework/tree/master/Reports)
 
+*[Очереди](https://github.com/olegtar83/OtusHomework/tree/master/Reports/Queues))
+*[Реплика на постгре](https://github.com/olegtar83/OtusHomework/tree/master/Reports/Replica)
+*[Шардирование на постгре](https://github.com/olegtar83/OtusHomework/tree/master/Reports/Sharding)
+*[Кэширование с редис](https://github.com/olegtar83/OtusHomework/tree/master/Reports/Cache)
+*[Tarantool](https://github.com/olegtar83/OtusHomework/tree/master/Reports/Tarantool)
 
 ![](https://api.visitorbadge.io/api/VisitorHit?user=olegtar83&repo=OtusHomework&countColor=%237B1E7A)

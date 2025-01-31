@@ -1,4 +1,5 @@
-﻿using LegendarySocialNetwork.Messages.DataClasses.Requests;
+﻿using Asp.Versioning;
+using LegendarySocialNetwork.Messages.DataClasses.Requests;
 using LegendarySocialNetwork.Messages.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -7,6 +8,8 @@ using System.Security.Claims;
 
 namespace LegendarySocialNetwork.Messages.Controllers
 {
+    [ApiVersion(1)]
+    [ApiVersion(2)]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
@@ -21,8 +24,9 @@ namespace LegendarySocialNetwork.Messages.Controllers
             _httpContextAccessor = httpContextAccessor;
         }
 
-        [HttpPost("{user_id}/[action]")]
-        public async Task<IActionResult> Send(string user_id, DialogReq req)
+        [MapToApiVersion(1)]
+        [HttpPost("{user_id}/send")]
+        public async Task<IActionResult> SendV1(string user_id, DialogReq req)
         {
             var res = await _dialogService.SetDialogAsync(GetUserId, user_id, req.Text);
             if (res.Succeeded)
@@ -32,8 +36,9 @@ namespace LegendarySocialNetwork.Messages.Controllers
             return BadRequest(res.Error);
         }
 
-        [HttpGet("{user_id}/[action]")]
-        public async Task<IActionResult> List(string user_id)
+        [MapToApiVersion(1)]
+        [HttpGet("{user_id}/list")]
+        public async Task<IActionResult> ListV1(string user_id)
         {
             var res = await _dialogService.GetDialogsAsync(user_id);
             if (res.Succeeded)
@@ -42,6 +47,31 @@ namespace LegendarySocialNetwork.Messages.Controllers
             }
             return BadRequest(res.Error);
         }
+
+        [MapToApiVersion(2)]
+        [HttpPost("{user_id}/send")]
+        public async Task<IActionResult> SendV2(string user_id, DialogReq req)
+        {
+            var res = await _dialogService.SetDialogAsync(GetUserId, user_id, req.Text);
+            if (res.Succeeded)
+            {
+                return Ok("Успешно отправленно сообщение.");
+            }
+            return BadRequest(res.Error);
+        }
+
+        [MapToApiVersion(2)]
+        [HttpGet("{user_id}/list")]
+        public async Task<IActionResult> ListV2(string user_id)
+        {
+            var res = await _dialogService.GetDialogsAsync(user_id);
+            if (res.Succeeded)
+            {
+                return Ok(res.Value);
+            }
+            return BadRequest(res.Error);
+        }
+
         private string GetUserId
         {
             get

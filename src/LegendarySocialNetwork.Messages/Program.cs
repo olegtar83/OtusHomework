@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using LegendarySocialNetwork.Messages.Database;
 using LegendarySocialNetwork.Messages.Filters;
 using LegendarySocialNetwork.Messages.Middlewares;
@@ -51,6 +52,22 @@ builder.Services.AddAuthentication(options =>
 
     });
 
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1);
+    options.ReportApiVersions = true;
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ApiVersionReader = ApiVersionReader.Combine(
+        new UrlSegmentApiVersionReader(),
+        new HeaderApiVersionReader("X-Api-Version"));
+})
+.AddMvc()
+.AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'V";
+    options.SubstituteApiVersionInUrl = true;
+});
+
 builder.Services.Configure<DatabaseSettings>(config.GetSection("DatabaseSettings"));
 config.GetSection(nameof(DatabaseSettings)).Bind(HashUtility.DbSettings);
 config.GetSection(nameof(DatabaseSettings)).Bind(DatabaseInitializer.DbSetting);
@@ -101,6 +118,5 @@ app.UseAuthorization();
 app.UseMiddleware<ErrorHandlerMiddleware>();
 app.UseCors();
 app.MapControllers();
-
 
 app.Run();

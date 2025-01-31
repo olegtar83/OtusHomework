@@ -1,6 +1,7 @@
 ﻿using CachingFramework.Redis;
 using CachingFramework.Redis.MsgPack;
 using Confluent.Kafka;
+using LegendarySocialNetwork.Application.Common.Handlers;
 using LegendarySocialNetwork.Application.Common.Interfaces;
 using LegendarySocialNetwork.Application.Consumers;
 using LegendarySocialNetwork.Domain.Messages;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis.Extensions.Core.Configuration;
 using StackExchange.Redis.Extensions.MsgPack;
+using System.Net;
 
 namespace LegendarySocialNetwork.Infrastructure
 {
@@ -74,6 +76,10 @@ namespace LegendarySocialNetwork.Infrastructure
                 });
 
             });
+
+            services.AddHttpClient("messages_client", 
+                c => c.BaseAddress = new Uri(Environment.GetEnvironmentVariable("Messages:Api")!))
+                    .AddHttpMessageHandler(sp => new RequestHeadersMessageHandler(sp));
 
             services.AddStackExchangeRedisExtensions<MsgPackObjectSerializer>(new RedisConfiguration
             {

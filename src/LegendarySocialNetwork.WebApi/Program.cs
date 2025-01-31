@@ -8,7 +8,6 @@ using LegendarySocialNetwork.WebApi.Hubs;
 using LegendarySocialNetwork.WebApi.Middlewares;
 using LegendarySocialNetwork.WebApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
@@ -68,7 +67,6 @@ builder.Services.AddAuthentication(options =>
         o.RequireHttpsMetadata = false;
         o.TokenValidationParameters = new TokenValidationParameters
         {
-
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = false,

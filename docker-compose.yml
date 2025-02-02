@@ -48,7 +48,7 @@ services:
       Kafka:PushFeedTopic: push-feed-topic
       Kafka:PushFeedGroup: push-feed-group
       Redis:ConnectionString: redis:6379,password=123b
-      Messages:Api: http://messages-api:7887/api
+      Messages:Api: http://messages-api
       Messages:ApiVersion: 1
     ports:
       - 7888:80

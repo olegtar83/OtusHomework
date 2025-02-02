@@ -5,9 +5,9 @@ using System.Text;
 
 namespace LegendarySocialNetwork.Application.Features.Chat
 {
-    public record SendCommand(string СompanionId, string Text) : IRequest<Result<Unit>>;
+    public record SendCommandRequest(string СompanionId, string Text) : IRequest<Result<Unit>>;
   
-    public class SendCommandHandler : IRequestHandler<SendCommand, Result<Unit>>
+    public class SendCommandHandler : IRequestHandler<SendCommandRequest, Result<Unit>>
     {
         private readonly IHttpClientFactory _clientFactory;
 
@@ -16,19 +16,18 @@ namespace LegendarySocialNetwork.Application.Features.Chat
             _clientFactory = clientFactory;       
         }
 
-        async Task<Result<Unit>> IRequestHandler<SendCommand, Result<Unit>>.Handle(SendCommand request, CancellationToken cancellationToken)
+        async Task<Result<Unit>> IRequestHandler<SendCommandRequest, Result<Unit>>.Handle(SendCommandRequest request, CancellationToken cancellationToken)
         {
             var client = _clientFactory.CreateClient("messages_client");
 
+            var content = SerializeJson(new { request.Text });
 
-            var content = SerializeJson(request.Text);
-
-            var result = await client.PostAsync($"/dialog{request.СompanionId}/send", content, cancellationToken);
+            var result = await client.PostAsync($"/api/dialog/{request.СompanionId}/send", content, cancellationToken);
 
             if (!result.IsSuccessStatusCode)
             {
-                var errorMessage = await result.Content.ReadAsStringAsync();
-                return Result<Unit>.Failure(errorMessage);
+                var bodyContent = await result.Content.ReadAsStringAsync();
+                return Result<Unit>.Failure(bodyContent ?? result.ReasonPhrase!);
             }
 
             return Result<Unit>.Success(Unit.Value);

@@ -2,12 +2,13 @@
 
 using LegendarySocialNetwork.Application.Common.Models;
 using MediatR;
+using Newtonsoft.Json;
 
 namespace LegendarySocialNetwork.Application.Features.Chat
 {
-    public record ListCommand(string СompanionId) : IRequest<Result<Unit>>;
+    public record ListCommandRequest(string СompanionId) : IRequest<Result<List<ChatResp>>>;
 
-    public class ListCommandHandler : IRequestHandler<ListCommand, Result<Unit>>
+    public class ListCommandHandler : IRequestHandler<ListCommandRequest, Result<List<ChatResp>>>
     {
         private readonly IHttpClientFactory _clientFactory;
 
@@ -16,19 +17,29 @@ namespace LegendarySocialNetwork.Application.Features.Chat
             _clientFactory = clientFactory;
         }
 
-        async Task<Result<Unit>> IRequestHandler<ListCommand, Result<Unit>>.Handle(ListCommand request, CancellationToken cancellationToken)
+        public async Task<Result<List<ChatResp>>> Handle(ListCommandRequest request, CancellationToken cancellationToken)
         {
             var client = _clientFactory.CreateClient("messages_client");
 
-            var result = await client.GetAsync($"/dialog{request.СompanionId}/list", cancellationToken);
+            var response = await client.GetAsync($"/api/dialog/{request.СompanionId}/list", cancellationToken);
 
-            if (!result.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
             {
-                var errorMessage = await result.Content.ReadAsStringAsync();
-                return Result<Unit>.Failure(errorMessage);
+                var bodyContent = await response.Content.ReadAsStringAsync();
+                return Result<List<ChatResp>>.Failure(bodyContent ?? response.ReasonPhrase!);
             }
 
-            return Result<Unit>.Success(Unit.Value);
+            var content = await response.Content.ReadAsStringAsync();
+
+            var result = JsonConvert.DeserializeObject<List<ChatResp>>(content);
+
+            return Result<List<ChatResp>>.Success(result!);
         }
     }
+        public class ChatResp
+        {
+            public required string From { get; set; }
+            public required string To { get; set; }
+            public required string Text { get; set; }
+        }
 }

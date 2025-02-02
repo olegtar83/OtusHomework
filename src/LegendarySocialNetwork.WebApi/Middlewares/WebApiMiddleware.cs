@@ -4,8 +4,8 @@ namespace LegendarySocialNetwork.WebApi.Middlewares
     public class WebApiMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly ILogger<ErrorHandlerMiddleware> _logger;
-        public WebApiMiddleware(RequestDelegate next, ILogger<ErrorHandlerMiddleware> logger)
+        private readonly ILogger<WebApiMiddleware> _logger;
+        public WebApiMiddleware(RequestDelegate next, ILogger<WebApiMiddleware> logger)
         {
             _next = next;
             _logger = logger;

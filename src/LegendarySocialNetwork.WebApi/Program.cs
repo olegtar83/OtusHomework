@@ -50,7 +50,6 @@ opt => opt.Configuration.ChannelPrefix = RedisChannel.Literal("signalR-"));
 
 builder.Services.AddHttpContextAccessor();
 
-
 builder.Services.AddScoped<IPushHubNotifier, PushHubNotifier>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
@@ -137,6 +136,7 @@ app.UseCors();
 app.UseHttpsRedirection();
 app.MapHub<FeedHub>("feed");
 app.UseAuthorization();
+app.UseMiddleware<WebApiMiddleware>();
 app.UseMiddleware<ErrorHandlerMiddleware>();
 app.MapControllers();
 

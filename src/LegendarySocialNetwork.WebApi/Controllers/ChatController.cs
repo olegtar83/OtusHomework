@@ -13,7 +13,7 @@ namespace LegendarySocialNetwork.WebApi.Controllers
         [HttpPost("{user_id}/send")]
         public async Task<IActionResult> Send(string user_id, string text)
         {
-            var res = await Mediator.Send(new SendCommand(user_id, text));
+            var res = await Mediator.Send(new SendCommandRequest(user_id, text));
             if (res.Succeeded)
             {
                 return Ok("Успешно отправленно сообщение.");
@@ -24,7 +24,7 @@ namespace LegendarySocialNetwork.WebApi.Controllers
         [HttpGet("{user_id}/list")]
         public async Task<IActionResult> List(string user_id)
         {
-            var res = await Mediator.Send(new ListCommand(user_id));
+            var res = await Mediator.Send(new ListCommandRequest(user_id));
             if (res.Succeeded)
             {
                 return Ok(res.Value);

@@ -17,11 +17,14 @@ namespace LegendarySocialNetwork.Messages.Controllers
     {
         private readonly IDialogService _dialogService;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ILogger<DialogController> _logger;
         public DialogController(IDialogService dialogService,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            ILogger<DialogController> logger)
         {
             _dialogService = dialogService;
             _httpContextAccessor = httpContextAccessor;
+            _logger = logger;
         }
 
         [MapToApiVersion(1)]
@@ -40,6 +43,7 @@ namespace LegendarySocialNetwork.Messages.Controllers
         [HttpGet("{user_id}/list")]
         public async Task<IActionResult> ListV1(string user_id)
         {
+            LogRequestHeader();
             var res = await _dialogService.GetDialogsAsync(user_id);
             if (res.Succeeded)
             {
@@ -79,6 +83,17 @@ namespace LegendarySocialNetwork.Messages.Controllers
                 var currentUserId = _httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier);
                 ArgumentNullException.ThrowIfNull(nameof(currentUserId));
                 return currentUserId!;
+            }
+        }
+
+        private void LogRequestHeader()
+        {
+            var requestIdHeader = _httpContextAccessor.HttpContext?
+                .Request.Headers["X-RequestId"].FirstOrDefault();
+
+            if (requestIdHeader != null)
+            {
+                _logger.LogInformation($"X-RequestId from header: { requestIdHeader.ToString()}");
             }
         }
     }

@@ -68,8 +68,6 @@ namespace LegendarySocialNetwork.Messages.Tarantool.HostedService
                 var tarantoolService = scope.ServiceProvider.GetRequiredService<ITarantoolService>();
 
                 var res = await tarantoolService.Sync();
-
-                _logger.LogInformation($"Tarantool replicated rows: {res}");
             }
             catch(Exception ex)
             {

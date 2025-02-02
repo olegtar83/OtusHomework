@@ -23,13 +23,12 @@ namespace LegendarySocialNetwork.Application.Features.Chat
 
             var response = await client.GetAsync($"/api/dialog/{request.СompanionId}/list", cancellationToken);
 
+            var content = await response.Content.ReadAsStringAsync();
+
             if (!response.IsSuccessStatusCode)
             {
-                var bodyContent = await response.Content.ReadAsStringAsync();
-                return Result<List<ChatResp>>.Failure(bodyContent ?? response.ReasonPhrase!);
+                return Result<List<ChatResp>>.Failure(content ?? response.ReasonPhrase!);
             }
-
-            var content = await response.Content.ReadAsStringAsync();
 
             var result = JsonConvert.DeserializeObject<List<ChatResp>>(content);
 

@@ -17,6 +17,7 @@ namespace LegendarySocialNetwork.Application.Common.Handlers
         {
             var httpContextAccessor = _sp.GetRequiredService<IHttpContextAccessor>();
             var httpContext = httpContextAccessor.HttpContext;
+
             var requestIdHeader = httpContext?.Request.Headers["X-RequestId"].FirstOrDefault();
             if (requestIdHeader != null)
                 request.Headers.Add("X-RequestId", requestIdHeader);

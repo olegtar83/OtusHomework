@@ -20,8 +20,8 @@
 
 ## HaProxy
 1) Настраиваем 2 реплики и 1 мастер на постгре
-2) ![psql-f](https://github.com/olegtar83/OtusHomework/blob/master/Reports/LoadBalancing/full.png)
+ ![psql-f](https://github.com/olegtar83/OtusHomework/blob/master/Reports/LoadBalancing/full.png)
 3) Убиваем одну из реплик и шлем запросы.
-4) ![psql-s](https://github.com/olegtar83/OtusHomework/blob/master/Reports/LoadBalancing/semi.png)
+ ![psql-s](https://github.com/olegtar83/OtusHomework/blob/master/Reports/LoadBalancing/semi.png)
 5) Одна из реплик идентифицирована как мертвая в результате healthchek-а, поэтому все запросы релоцируются на живую.
 

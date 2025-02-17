@@ -1,10 +1,10 @@
 ﻿version: "3.9"
 
 services:
-  master-db:
+  messages-db:
     image: postgres:14
-    container_name: master-db
-    hostname: master-db
+    container_name: messages-db
+    hostname: messages-db
     environment:
       POSTGRES_DB: "legendarydb"
       POSTGRES_USER: "dbuser"
@@ -13,11 +13,11 @@ services:
     mem_limit: 2gb
     shm_size: 2gb 
     ports:
-      - 5432:5432
+      - 5435:5432
     volumes:
-      - ./Postgres/main:/docker-entrypoint-initdb.d # Инициализация таблиц
+      - ./Postgres/messages:/docker-entrypoint-initdb.d # Инициализация таблиц
       - ./Postgres/postgresql.conf:/etc/postgresql/postgresql.conf
-      - postgres-data:/var/lib/postgresql/data
+      - postgres-messages-data:/var/lib/postgresql/data
     networks:
       - legendary-network
     healthcheck:
@@ -25,19 +25,101 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-  legendary-api:
+  postgresql-master:
+    container_name: postgresql-master
+    image: 'docker.io/bitnami/postgresql:11-debian-10'
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgresql_master_data:/bitnami/postgresql
+      - ./Postgres/main:/docker-entrypoint-initdb.d # Инициализация таблиц
+    environment:
+      - POSTGRESQL_PGAUDIT_LOG=READ,WRITE
+      - POSTGRESQL_LOG_HOSTNAME=true
+      - POSTGRESQL_REPLICATION_MODE=master
+      - POSTGRESQL_REPLICATION_USER=repl_user
+      - POSTGRESQL_REPLICATION_PASSWORD=repl_password
+      - POSTGRESQL_USERNAME=dbuser
+      - POSTGRESQL_DATABASE=legendarydb
+      - ALLOW_EMPTY_PASSWORD=yes
+    networks:
+      - legendary-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dbuser -d legendarydb"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  postgresql-slave1:
+      container_name: postgresql-slave1
+      image: 'docker.io/bitnami/postgresql:11-debian-10'
+      ports:
+        - 5433:5432
+      depends_on:
+       postgresql-master:
+          condition: service_healthy
+      environment:
+        - POSTGRESQL_USERNAME=dbuser
+        - POSTGRESQL_DATABASE=legendarydb
+        - POSTGRESQL_MASTER_HOST=postgresql-master
+        - POSTGRESQL_PGAUDIT_LOG=READ,WRITE
+        - POSTGRESQL_LOG_HOSTNAME=true
+        - POSTGRESQL_REPLICATION_MODE=slave
+        - POSTGRESQL_REPLICATION_USER=repl_user
+        - POSTGRESQL_REPLICATION_PASSWORD=repl_password
+        - POSTGRESQL_MASTER_PORT_NUMBER=5432
+        - ALLOW_EMPTY_PASSWORD=yes
+      networks:
+      - legendary-network
+  postgresql-slave2:
+      container_name: postgresql-slave2
+      image: 'docker.io/bitnami/postgresql:11-debian-10'
+      ports:
+        - 5434:5432
+      depends_on:
+       postgresql-master:
+          condition: service_healthy
+      environment:
+        - POSTGRESQL_USERNAME=dbuser
+        - POSTGRESQL_DATABASE=legendarydb
+        - POSTGRESQL_MASTER_HOST=postgresql-master
+        - POSTGRESQL_PGAUDIT_LOG=READ,WRITE
+        - POSTGRESQL_LOG_HOSTNAME=true
+        - POSTGRESQL_REPLICATION_MODE=slave
+        - POSTGRESQL_REPLICATION_USER=repl_user
+        - POSTGRESQL_REPLICATION_PASSWORD=repl_password
+        - POSTGRESQL_MASTER_PORT_NUMBER=5432
+        - ALLOW_EMPTY_PASSWORD=yes
+      networks:
+      - legendary-network
+  haproxy-lb:
+    image: haproxy:2.4
+    container_name: haproxy-lb
+    restart: "no"
+    volumes:
+      - ./load-balance/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+    ports:
+      - 5002:5002
+      - 7002:7002
+    depends_on:
+      - postgresql-master
+      - postgresql-slave1
+      - postgresql-slave2
+    networks:
+      - legendary-network
+  legendary-api1:
     image: legendary-api-image
     build:
       context: ./src
       dockerfile: LegendarySocialNetwork.WebApi/Dockerfile
-    container_name: legendary-api
+    container_name: legendary-api1
     restart: always
     environment:
       # Основные настройки для работы API
       ASPNETCORE_URLS: "http://+:80"
       AllowedHosts: "*" # Ограничивает хосты, которые могут подключаться к API. По умолчанию - все
       # Строка подключения к базе данных Postgres
-      DatabaseSettings:MasterConnStr: "Host=master-db;Port=5432;Username=dbuser;Password=dbpassword;Database=legendarydb;Pooling=true;Maximum Pool Size=950;Minimum Pool Size=200;Timeout=300;CommandTimeout=300;Connection Idle Lifetime=300;Connection Pruning Interval=10;Keepalive=60;TCP Keepalive Time=60;TCP Keepalive Interval=10"
+      DatabaseSettings:MasterConnStr: "Host=haproxy-lb;Port=5002;Username=dbuser;Database=legendarydb;Pooling=true;"
+      DatabaseSettings:ReplicaConnStr1: "Host=haproxy-lb;Port=5003;Username=dbuser;Database=legendarydb;Pooling=true;"
       JWTSettings:Key: "superSecretKey@34512312312312312"
       JWTSettings:Issuer: legendary.social.network
       JWTSettings:Audience: legendary.social.network
@@ -55,12 +137,63 @@ services:
     mem_limit: 1024m
     entrypoint: dotnet LegendarySocialNetwork.WebApi.dll
     depends_on:
-       master-db:
-          condition: service_healthy
+       postgresql-master:
+          condition: service_started
        kafka:
           condition: service_started
        redis:
           condition: service_started
+    networks:
+      - legendary-network
+  legendary-api2:
+    image: legendary-api-image
+    build:
+      context: ./src
+      dockerfile: LegendarySocialNetwork.WebApi/Dockerfile
+    container_name: legendary-api2
+    restart: always
+    environment:
+      # Основные настройки для работы API
+      ASPNETCORE_URLS: "http://+:80"
+      AllowedHosts: "*" # Ограничивает хосты, которые могут подключаться к API. По умолчанию - все
+      # Строка подключения к базе данных Postgres
+      DatabaseSettings:MasterConnStr: "Host=haproxy-lb;Port=5002;Username=dbuser;Database=legendarydb;Pooling=true;Maximum Pool Size=950;Minimum Pool Size=200;Timeout=300;CommandTimeout=300;Connection Idle Lifetime=300;Connection Pruning Interval=10;Keepalive=60;TCP Keepalive Time=60;TCP Keepalive Interval=10"
+      DatabaseSettings:ReplicaConnStr1: "Host=haproxy-lb;Port=5003;Username=dbuser;Database=legendarydb;Pooling=true;Maximum Pool Size=950;Minimum Pool Size=200;Timeout=300;CommandTimeout=300;Connection Idle Lifetime=300;Connection Pruning Interval=10;Keepalive=60;TCP Keepalive Time=60;TCP Keepalive Interval=10"
+      JWTSettings:Key: "superSecretKey@34512312312312312"
+      JWTSettings:Issuer: legendary.social.network
+      JWTSettings:Audience: legendary.social.network
+      JWTSettings:DurationInMinutes: "60"
+      Kafka:Host: kafka:29092
+      Kafka:UpdateFeedTopic: update-feed-posts
+      Kafka:UpdateFeedGroup: update-feed-group
+      Kafka:PushFeedTopic: push-feed-topic
+      Kafka:PushFeedGroup: push-feed-group
+      Redis:ConnectionString: redis:6379,password=123b
+      Messages:Api: http://messages-api
+      Messages:ApiVersion: 1
+    ports:
+      - 7889:80
+    mem_limit: 1024m
+    entrypoint: dotnet LegendarySocialNetwork.WebApi.dll
+    depends_on:
+       postgresql-master:
+          condition: service_started
+       kafka:
+          condition: service_started
+       redis:
+          condition: service_started
+    networks:
+      - legendary-network
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    volumes:
+      - ./load-balance/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 80:80
+    depends_on:
+      - legendary-api1
+      - legendary-api2
     networks:
       - legendary-network
   redis:
@@ -125,7 +258,7 @@ services:
       # Основные настройки для работы API
       ASPNETCORE_URLS: "http://+:80"
       AllowedHosts: "*" 
-      DatabaseSettings:CitusConnStr: "Host=master-db;Port=5432;Username=dbuser;Password=dbpassword;Database=legendarydb;Pooling=true;Maximum Pool Size=1450;Minimum Pool Size=300;Timeout=600;CommandTimeout=600;Connection Idle Lifetime=300;Connection Pruning Interval=10;Keepalive=60;TCP Keepalive Time=60;TCP Keepalive Interval=10"
+      DatabaseSettings:CitusConnStr: "Host=messages-db;Port=5432;Username=dbuser;Password=dbpassword;Database=legendarydb;Pooling=true;Maximum Pool Size=1450;Minimum Pool Size=300;Timeout=600;CommandTimeout=600;Connection Idle Lifetime=300;Connection Pruning Interval=10;Keepalive=60;TCP Keepalive Time=60;TCP Keepalive Interval=10"
       DatabaseSettings:ShardsNode: 16
       Tarantool:ConnStr: tarantool:tarantool@tarantool:3301
       JWTSettings:Key: "superSecretKey@34512312312312312"
@@ -134,13 +267,13 @@ services:
     ports:
       - 7887:80
     depends_on:
-       master-db:
+       messages-db:
           condition: service_healthy
     mem_limit: 2048m
     entrypoint: dotnet LegendarySocialNetwork.Messages.dll
     networks:
       - legendary-network
-  tarantool: 
+  tarantool:
     build:
       context: .
       dockerfile: Tarantool/Dockerfile
@@ -149,7 +282,7 @@ services:
     environment:
       TARANTOOL_USER_NAME: tarantool
       TARANTOOL_USER_PASSWORD: tarantool
-      PG_HOST: master-db
+      PG_HOST: messages-db
       PG_USER: dbuser
       PG_PASSWORD: dbpassword
       PG_DATABASE: legendarydb
@@ -161,7 +294,7 @@ services:
     ports:
         - 3301:3301
     depends_on:
-       master-db:
+       messages-db:
           condition: service_healthy
     networks:
       - legendary-network
@@ -186,7 +319,8 @@ volumes:
   kafka-data:
   healthcheck-volume:
   redis-data:
-  postgres-data:
+  postgresql_master_data:
+  postgres-messages-data:
   tarantool-data:
 networks:
   legendary-network:

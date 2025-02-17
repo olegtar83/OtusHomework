@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\docker-compose-sharding.yml = ..\docker-compose-sharding.yml
 		..\docker-compose.yml = ..\docker-compose.yml
 		global.json = global.json
+		..\load-balance\haproxy.cfg = ..\load-balance\haproxy.cfg
+		..\load-balance\nginx.conf = ..\load-balance\nginx.conf
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LegendarySocialNetwork.Domain", "LegendarySocialNetwork.Domain\LegendarySocialNetwork.Domain.csproj", "{2D301A39-A334-4300-B57D-DDA541549C5D}"

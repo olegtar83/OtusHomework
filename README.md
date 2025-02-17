@@ -24,6 +24,8 @@ docker-compose up -d --build
 * [Шардирование на постгре](https://github.com/olegtar83/OtusHomework/tree/master/Reports/Sharding)
 * [Кэширование с редис](https://github.com/olegtar83/OtusHomework/tree/master/Reports/Cache)
 * [Tarantool](https://github.com/olegtar83/OtusHomework/tree/master/Reports/Tarantool)
+* [Репликация и балансировка](https://github.com/olegtar83/OtusHomework/tree/master/Reports/LoadBalancing)
+
   
 
 ![](https://api.visitorbadge.io/api/VisitorHit?user=olegtar83&repo=OtusHomework&countColor=%237B1E7A)

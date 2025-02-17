@@ -1,7 +1,7 @@
 # Load Balancing
 
 ## Nginx
-1) Добавляем конфигурацию в файл `load-balancing/nginx.conf`, теперь сайт доступен по ссылке `http://localhost/swagger/index.html`
+1) Добавляем конфигурацию в файл `load-balance/nginx.conf`, теперь сайт доступен по ссылке `http://localhost/swagger/index.html`
 2) Статиска по запросам и подключениям:
    ```
     Active connections: 2 

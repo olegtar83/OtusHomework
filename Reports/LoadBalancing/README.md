@@ -19,7 +19,7 @@
 4) Если убить одну из реплик `docker kill -s 9`, nginx релоцирует на другую.
 
 ## HaProxy
-1) Настраиваем 2 реплики и 1 мастер на постгре
+1) Настраиваем 2 реплики и 1 мастер на постгре в файле `load-balance/haproxy.cfg`
  ![psql-f](https://github.com/olegtar83/OtusHomework/blob/master/Reports/LoadBalancing/full.png)
 3) Убиваем одну из реплик и шлем запросы.
  ![psql-s](https://github.com/olegtar83/OtusHomework/blob/master/Reports/LoadBalancing/semi.png)

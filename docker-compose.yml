@@ -157,8 +157,8 @@ services:
       ASPNETCORE_URLS: "http://+:80"
       AllowedHosts: "*" # Ограничивает хосты, которые могут подключаться к API. По умолчанию - все
       # Строка подключения к базе данных Postgres
-      DatabaseSettings:MasterConnStr: "Host=haproxy-lb;Port=5002;Username=dbuser;Database=legendarydb;Pooling=true;Maximum Pool Size=950;Minimum Pool Size=200;Timeout=300;CommandTimeout=300;Connection Idle Lifetime=300;Connection Pruning Interval=10;Keepalive=60;TCP Keepalive Time=60;TCP Keepalive Interval=10"
-      DatabaseSettings:ReplicaConnStr1: "Host=haproxy-lb;Port=5003;Username=dbuser;Database=legendarydb;Pooling=true;Maximum Pool Size=950;Minimum Pool Size=200;Timeout=300;CommandTimeout=300;Connection Idle Lifetime=300;Connection Pruning Interval=10;Keepalive=60;TCP Keepalive Time=60;TCP Keepalive Interval=10"
+      DatabaseSettings:MasterConnStr: "Host=haproxy-lb;Port=5002;Username=dbuser;Database=legendarydb;Pooling=true;"
+      DatabaseSettings:ReplicaConnStr1: "Host=haproxy-lb;Port=5003;Username=dbuser;Database=legendarydb;Pooling=true;"
       JWTSettings:Key: "superSecretKey@34512312312312312"
       JWTSettings:Issuer: legendary.social.network
       JWTSettings:Audience: legendary.social.network

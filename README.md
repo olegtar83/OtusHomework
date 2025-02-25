@@ -28,4 +28,5 @@ docker-compose up -d --build
 
   
 
-![](https://api.visitorbadge.io/api/VisitorHit?user=olegtar83&repo=OtusHomework&countColor=%237B1E7A)
+<!--<img src="https://api.visitorbadge.io/api/VisitorHit?user=olegtar83&repo=OtusHomework&countColor=%237B1E7A" />-->
+

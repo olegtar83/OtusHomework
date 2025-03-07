@@ -18,9 +18,9 @@ namespace LegendarySocialNetwork.Application.Features.Auth.Login
         {
             _authRepository = authRepository;
         }
-        public async Task<Result<AccountEntity>> Handle(LoginUserQueryRequest request, CancellationToken cancellationToken)
+        public Task<Result<AccountEntity>> Handle(LoginUserQueryRequest request, CancellationToken cancellationToken)
         {
-            return await _authRepository.GetLoginAsync(request.Id);
+            return _authRepository.GetLoginAsync(request.Id);
         }
     }
 }

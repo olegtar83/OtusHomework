@@ -13,9 +13,9 @@ namespace LegendarySocialNetwork.Application.Features.Auth.Register
             _authRepository = authRepository;
         }
 
-        public async Task<Result<string>> Handle(RegisterUserRequest request, CancellationToken cancellationToken)
+        public Task<Result<string>> Handle(RegisterUserRequest request, CancellationToken cancellationToken)
         {
-            return await _authRepository.RegisterAsync(new Domain.Entities.UserEntity
+            return _authRepository.RegisterAsync(new Domain.Entities.UserEntity
             {
                 Age = request.Age,
                 Biography = request.Biography,

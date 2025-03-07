@@ -15,9 +15,9 @@ namespace LegendarySocialNetwork.Application.Features.User
         {
             _userRepository = userRepository;
         }
-        public async Task<Result<List<UserEntity>>> Handle(SearchUsersQueryRequest request, CancellationToken cancellationToken)
+        public  Task<Result<List<UserEntity>>> Handle(SearchUsersQueryRequest request, CancellationToken cancellationToken)
         {
-            return await _userRepository.SearchUserAsync(request.FirstName, request.LastName);
+            return _userRepository.SearchUserAsync(request.FirstName, request.LastName);
         }
     }
 }

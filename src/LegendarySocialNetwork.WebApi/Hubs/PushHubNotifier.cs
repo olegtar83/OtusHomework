@@ -3,10 +3,6 @@ using LegendarySocialNetwork.Application.Common.Interfaces;
 using LegendarySocialNetwork.Domain.Messages;
 using LegendarySocialNetwork.WebApi.DataClasses.Dtos;
 using Microsoft.AspNetCore.SignalR;
-using StackExchange.Redis;
-using StackExchange.Redis.Extensions.Core.Abstractions;
-using System.Collections.Concurrent;
-using System.Text.Json;
 
 namespace LegendarySocialNetwork.WebApi.Hubs
 {

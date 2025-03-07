@@ -1,7 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Hosting.Server;
-
-namespace LegendarySocialNetwork.Messages.Tarantool.HostedService
+﻿namespace LegendarySocialNetwork.Messages.Tarantool.HostedService
 {
     public class TarantoolReplicatorService : IHostedLifecycleService
     {
@@ -69,7 +66,7 @@ namespace LegendarySocialNetwork.Messages.Tarantool.HostedService
 
                 var res = await tarantoolService.Sync();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex.ToString(), ex?.ToString());
             }

@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using LegendarySocialNetwork.Messages;
 using LegendarySocialNetwork.Messages.Database;
 using LegendarySocialNetwork.Messages.Filters;
 using LegendarySocialNetwork.Messages.Middlewares;
@@ -73,9 +74,9 @@ config.GetSection(nameof(DatabaseSettings)).Bind(HashUtility.DbSettings);
 config.GetSection(nameof(DatabaseSettings)).Bind(DatabaseInitializer.DbSetting);
 builder.Services.AddScoped<IDatabaseContext, DatabaseContext>();
 builder.Services.AddTransient<IDialogService, DialogService>();
-builder.Services.AddSingleton<ITarantoolService,  TarantoolService>();
+builder.Services.AddSingleton<ITarantoolService, TarantoolService>();
 builder.Services.AddHostedService<TarantoolReplicatorService>();
-
+builder.Services.AddInfrastracture();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
@@ -109,6 +110,7 @@ builder.Services.AddSwaggerGen(c =>
                     },
                 });
 });
+
 var app = builder.Build();
 await DatabaseInitializer.Init();
 app.UseSwagger();

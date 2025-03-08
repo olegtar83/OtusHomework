@@ -7,12 +7,12 @@ using LegendarySocialNetwork.Application.Consumers;
 using LegendarySocialNetwork.Domain.Messages;
 using LegendarySocialNetwork.Infrastructure.Caching;
 using LegendarySocialNetwork.Infrastructure.Repositories;
+using LegendarySocialNetwork.Infrastructure.Saga;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis.Extensions.Core.Configuration;
 using StackExchange.Redis.Extensions.MsgPack;
-using System.Net;
 
 namespace LegendarySocialNetwork.Infrastructure
 {
@@ -40,18 +40,28 @@ namespace LegendarySocialNetwork.Infrastructure
             services.AddScoped<IFeedRepository, FeedRepository>();
             services.Decorate<IFeedRepository, CachedFeedRepository>();
 
-
             services.AddScoped(typeof(IListCache<>), typeof(RedisListCache<>));
 
             services.AddMassTransit(x =>
             {
-                x.UsingInMemory();
+                x.UsingInMemory((context, cfg) => cfg.ConfigureEndpoints(context));
 
                 x.AddRider(rider =>
                 {
+                    rider.AddProducer<string, InitSaga>(Environment.GetEnvironmentVariable("Kafka:InitSagaTopic"));
+                    rider.AddProducer<string, CreateMessage>(Environment.GetEnvironmentVariable("Kafka:CreateMessageTopic"));
+                    rider.AddProducer<string, IncrementCounter>(Environment.GetEnvironmentVariable("Kafka:IncrementCounterTopic"));
+                    rider.AddProducer<string, DecrementCounter>(Environment.GetEnvironmentVariable("Kafka:DecrementCounterTopic"));
+
                     rider.AddConsumer<UpdateCacheFeedConsumer>();
                     rider.AddConsumer<PushFeedWebSocketConsumer>();
 
+                    rider.AddSagaStateMachine<CounterSagaStateMachine, CounterSagaStateInstance>()
+                    .RedisRepository(Environment.GetEnvironmentVariable("Redis:ConnectionString"), configure =>
+                     {
+                         configure.ConcurrencyMode = ConcurrencyMode.Pessimistic;
+                         configure.KeyPrefix = "Saga";
+                     });
 
                     rider.UsingKafka((context, k) =>
                     {
@@ -72,12 +82,36 @@ namespace LegendarySocialNetwork.Infrastructure
                                e.ConfigureConsumer<PushFeedWebSocketConsumer>(context);
                                e.AutoOffsetReset = AutoOffsetReset.Earliest;
                            });
+
+                        k.TopicEndpoint<string, InitSaga>(Environment.GetEnvironmentVariable("Kafka:InitSagaTopic"), $"{Environment.GetEnvironmentVariable("Kafka:InitSagaTopic")}_group", e =>
+                        {
+                            e.AutoOffsetReset = AutoOffsetReset.Earliest;
+                            e.CreateIfMissing(x => x.ReplicationFactor = 1);
+                            e.ConfigureSaga<CounterSagaStateInstance>(context);
+                            e.DiscardSkippedMessages();
+                        });
+
+                        k.TopicEndpoint<string, MessageFailed>(Environment.GetEnvironmentVariable("Kafka:MessageFailedTopic"), $"{Environment.GetEnvironmentVariable("Kafka:MessageFailedTopic")}_group", e =>
+                        {
+                            e.AutoOffsetReset = AutoOffsetReset.Earliest;
+                            e.CreateIfMissing(x => x.ReplicationFactor = 1);
+                            e.ConfigureSaga<CounterSagaStateInstance>(context);
+                            e.DiscardSkippedMessages();
+                        });
+
+                        k.TopicEndpoint<string, MessageCreated>(Environment.GetEnvironmentVariable("Kafka:MessageCreatedTopic"), $"{Environment.GetEnvironmentVariable("Kafka:MessageCreatedTopic")}_group", e =>
+                        {
+                            e.AutoOffsetReset = AutoOffsetReset.Earliest;
+                            e.CreateIfMissing(x => x.ReplicationFactor = 1);
+                            e.ConfigureSaga<CounterSagaStateInstance>(context);
+                            e.DiscardSkippedMessages();
+                        });
                     });
                 });
 
             });
 
-            services.AddHttpClient("messages_client", 
+            services.AddHttpClient("messages_client",
                 c => c.BaseAddress = new Uri(Environment.GetEnvironmentVariable("Messages:Api")!))
                     .AddHttpMessageHandler(sp => new RequestHeadersMessageHandler(sp));
 

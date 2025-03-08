@@ -35,7 +35,7 @@
 
 7) При создани саги используется одно состояния `WaitingForMessageCreation` для перехода между действиями и 
    привязка по CorrelationId который передается в заголовке и соединяет между сообщениями для консистенции, все это 
-   отображается в репозитории состояния Redis.
+   отображается в репозитории Redis.
 
    ![redis-saga](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Saga/redis-saga.png)
   

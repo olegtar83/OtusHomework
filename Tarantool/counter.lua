@@ -3,6 +3,8 @@ box.cfg
     log_level = 5
 }
 
+local log = require('log')
+
 if box.space.counter == nil then
     box.schema.space.create('counter')
     box.space.counter:format({
@@ -20,10 +22,10 @@ else
 end
 
 function get_counter(owner, other)
-    counter =  box.execute([[SELECT * FROM "counter" WHERE "from"=:owner AND "to"=:other;]],{{[':owner']=owner},{[':other']=other}})
-        if counter.rows[1] ~= nil then
-                return counter
-        end
+    counter =  box.execute([[SELECT "count" FROM "counter" WHERE "from"=:owner AND "to"=:other;]],{{[':owner']=owner},{[':other']=other}})
+    if counter.rows[1] ~= nil then
+        return {counter.rows[1][1]}
+    end
         return nil
 end
 

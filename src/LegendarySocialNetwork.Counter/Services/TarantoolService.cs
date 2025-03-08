@@ -1,9 +1,7 @@
 ﻿using LegendarySocialNetwork.Counter.DataClasses.Models;
 using MediatR;
-using ProGaudi.MsgPack.Light;
 using ProGaudi.Tarantool.Client;
 using ProGaudi.Tarantool.Client.Model;
-using ProGaudi.Tarantool.Client.Model.Responses;
 
 namespace LegendarySocialNetwork.Counter.Services
 {
@@ -19,10 +17,7 @@ namespace LegendarySocialNetwork.Counter.Services
         private readonly Box _box;
         public TarantoolService()
         {
-            var msgPackContext = new MsgPackContext();
-            msgPackContext.GenerateAndRegisterArrayConverter<CounterTar>();
-
-            var clientOptions = new ClientOptions(connStr, context: msgPackContext);
+            var clientOptions = new ClientOptions(connStr);
             _box = new Box(clientOptions);
             _box.Connect().ConfigureAwait(false).GetAwaiter().GetResult();
         }
@@ -43,10 +38,16 @@ namespace LegendarySocialNetwork.Counter.Services
 
         public async Task<Result<int>> GetMessageCounter(string from, string to)
         {
-            var res = await _box.Call_1_6<TarantoolTuple<string, string>, TarantoolTuple<CounterTar>>("get_counter",
-                TarantoolTuple.Create(from, to));
+            var res = await _box.Call_1_6<TarantoolTuple<string, string>, TarantoolTuple<int>> ("get_counter",TarantoolTuple.Create(from, to));
 
-            return Result<int>.Success(res.Data[0].Item1.Count);
+            if (res.Data == null || res.Data.Count() == 0 || res.Data[0].Item1 == 0)
+            {
+                return Result<int>.Failure("No data received from Tarantool.");
+            }
+            var row = res.Data[0].Item1;
+
+            return Result<int>.Success(row);
         }
+
     }
 }

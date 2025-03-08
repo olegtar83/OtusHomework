@@ -20,7 +20,7 @@
 
      ![saga](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Saga/diagram.png)
 
-3) Для проверки можно зайти в kafka-ui - `http://localhost:8080/`, все нужные топики создались, на данный момент пустые
+3) Если зайти в kafka-ui - `http://localhost:8080/` то можно увидеть все нужные топики - на данный момент пустые.
      
      ![kafka-ui](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Saga/kafka-ui.png)
 
@@ -34,7 +34,8 @@
    счетчик в результате провала сохранения сообщения.
 
 7) При создани саги используется одно состояния `WaitingForMessageCreation` для перехода между действиями и 
-   привязка по CorrelationId который передается в заголовке и соединяет между сообщениями, все это отображается в репозитории состояния Redis.
+   привязка по CorrelationId который передается в заголовке и соединяет между сообщениями для консистеници, все это 
+   отображается в репозитории состояния Redis.
 
    ![redis-saga](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Saga/redis-saga.png)
   

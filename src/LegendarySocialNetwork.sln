@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LegendarySocialNetwork.Appl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LegendarySocialNetwork.Messages", "LegendarySocialNetwork.Messages\LegendarySocialNetwork.Messages.csproj", "{4DAA7D89-0336-4C38-9FD8-C83C67017C2F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LegendarySocialNetwork.Counter", "LegendarySocialNetwork.Counter\LegendarySocialNetwork.Counter.csproj", "{103B2CB3-4143-48EC-BEF2-8C103AC7F0F0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,10 @@ Global
 		{4DAA7D89-0336-4C38-9FD8-C83C67017C2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4DAA7D89-0336-4C38-9FD8-C83C67017C2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4DAA7D89-0336-4C38-9FD8-C83C67017C2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{103B2CB3-4143-48EC-BEF2-8C103AC7F0F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{103B2CB3-4143-48EC-BEF2-8C103AC7F0F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{103B2CB3-4143-48EC-BEF2-8C103AC7F0F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{103B2CB3-4143-48EC-BEF2-8C103AC7F0F0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

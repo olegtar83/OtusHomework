@@ -129,7 +129,6 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
-
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseCors();
@@ -139,5 +138,4 @@ app.UseAuthorization();
 app.UseMiddleware<WebApiMiddleware>();
 app.UseMiddleware<ErrorHandlerMiddleware>();
 app.MapControllers();
-
 app.Run();

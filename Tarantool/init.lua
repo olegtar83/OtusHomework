@@ -125,5 +125,6 @@ function sync()
 end
 
 box.once('init', init)
+dofile("/usr/local/share/tarantool/init/counter.lua")
 log.info("Script ended")
 print("Script ended print")

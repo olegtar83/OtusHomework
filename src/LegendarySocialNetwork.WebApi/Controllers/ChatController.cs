@@ -13,7 +13,7 @@ namespace LegendarySocialNetwork.WebApi.Controllers
         [HttpPost("{user_id}/send")]
         public async Task<IActionResult> Send(string user_id, string text)
         {
-            var res = await Mediator.Send(new SendCommandRequest(user_id, text));
+            var res = await Mediator.Send(new SagaCommandRequest(user_id, text));
             if (res.Succeeded)
             {
                 return Ok("Успешно отправленно сообщение.");

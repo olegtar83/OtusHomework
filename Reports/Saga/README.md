@@ -20,7 +20,7 @@
 
      ![saga](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Saga/diagram.png)
 
-3) Если зайти в kafka-ui - `http://localhost:8080/` то можно увидеть все нужные топики - на данный момент пустые.
+3) Если зайти в kafka-ui - `http://localhost:8080/` то можно увидеть все нужные топики.
      
      ![kafka-ui](https://github.com/olegtar83/OtusHomework/blob/master/Reports/Saga/kafka-ui.png)
 

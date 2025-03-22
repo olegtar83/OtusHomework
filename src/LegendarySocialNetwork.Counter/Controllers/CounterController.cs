@@ -17,7 +17,6 @@ namespace LegendarySocialNetwork.Counter.Controllers
         {
             _tarantoolService = tarantoolService;
             _httpContextAccessor = httpContextAccessor;
-
         }
 
         [HttpGet("/{user_id}")]

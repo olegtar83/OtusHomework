@@ -1,4 +1,4 @@
-## Otus Highload.Social Network
+## Otus Highload Social Network
 ![GitHub repo size](https://img.shields.io/github/repo-size/olegtar83/OtusHomework?style=plastic)
 ![GitHub language count](https://img.shields.io/github/languages/count/olegtar83/OtusHomework?style=plastic)
 ![GitHub top language](https://img.shields.io/github/languages/top/olegtar83/OtusHomework?style=plastic) 

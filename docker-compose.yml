@@ -349,15 +349,106 @@ services:
         - 8000:80
     networks:
       - legendary-network
-  # legendary-react-app:
-  #   build:
-  #     context: ./client
-  #     dockerfile: Dockerfile
-  #   container_name: legendary-react-app
-  #   ports:
-  #     - 3000:80
-  #   networks:
-  #     - legendary-network  
+  legendary-react-app:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: legendary-react-app
+    ports:
+      - 3001:80
+    networks:
+      - legendary-network
+  zabbix-server:
+    image: zabbix/zabbix-server-pgsql:latest
+    container_name: zabbix-server
+    environment:
+      - DB_SERVER_HOST=pg_zabbix
+      - POSTGRES_USER=zabbix
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=zabbix
+    networks:
+      - legendary-network
+    ports:
+      - "10051:10051"
+    depends_on:
+      pg_zabbix:
+        condition: service_healthy
+    volumes:
+      - zabbix-server-data:/var/lib/zabbix
+  zabbix-web:
+    image: zabbix/zabbix-web-nginx-pgsql:latest
+    container_name: zabbix-web
+    environment:
+      - DB_SERVER_HOST=pg_zabbix
+      - POSTGRES_USER=zabbix
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=zabbix
+      - ZBX_SERVER_HOST=zabbix-server
+    networks:
+      - legendary-network
+    ports:
+      - "8081:8080"
+    depends_on:
+      - zabbix-server
+      - pg_zabbix
+  pg_zabbix:
+    image: postgres:15
+    container_name: pg_zabbix
+    environment:
+      - POSTGRES_USER=zabbix
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=zabbix
+    networks:
+      - legendary-network
+    volumes:
+      - pg_zabbix-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "zabbix"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  zabbix-agent:
+    image: zabbix/zabbix-agent:latest
+    container_name: zabbix-agent
+    environment:
+      - ZBX_SERVER_HOST=zabbix-server
+      - ZBX_HOSTNAME=messages-api-container
+    networks:
+      - legendary-network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    pid: host
+    privileged: true
+    depends_on:
+      - zabbix-server
+      - messages-api
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:v2.47.0
+    command:
+      - --web.enable-remote-write-receiver
+      - --enable-feature=native-histograms
+      - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      - legendary-network
+    ports:
+      - "9090:9090"
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:10.1.2
+    depends_on:
+      - prometheus
+    networks:
+      - legendary-network
+    ports:
+      - "3003:3000"
+    environment:
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_BASIC_ENABLED=false
+      - GF_INSTALL_PLUGINS=alexanderzobnin-zabbix-app
 volumes:
   kafka-data:
   healthcheck-volume:
@@ -365,6 +456,8 @@ volumes:
   postgresql_master_data:
   postgres-messages-data:
   tarantool-data:
+  pg_zabbix-data:
+  zabbix-server-data:
 networks:
   legendary-network:
     driver: bridge

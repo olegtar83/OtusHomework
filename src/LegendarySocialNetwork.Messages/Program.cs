@@ -10,6 +10,8 @@ using LegendarySocialNetwork.Messages.Utilities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using OpenTelemetry.Metrics;
+using Prometheus;
 using System.Text;
 
 var config = new ConfigurationBuilder().AddEnvironmentVariables().Build();
@@ -29,6 +31,13 @@ builder.Services.AddCors(options => options
             .AllowAnyMethod()));
 builder.Services.AddHttpContextAccessor();
 
+builder.Services.AddOpenTelemetry()
+    .WithMetrics(b => b
+        .AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddRuntimeInstrumentation()
+        .AddProcessInstrumentation()
+        .AddPrometheusExporter());
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAuthentication(options =>
 {
@@ -115,10 +124,13 @@ var app = builder.Build();
 await DatabaseInitializer.Init();
 app.UseSwagger();
 app.UseSwaggerUI();
+app.UseHttpMetrics();
+app.UseMetricServer();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.UseMiddleware<ErrorHandlerMiddleware>();
 app.UseCors();
 app.MapControllers();
+app.MapPrometheusScrapingEndpoint();
 
 app.Run();

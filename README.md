@@ -19,13 +19,13 @@ docker-compose up -d --build
 
 [#Задачи](https://github.com/olegtar83/OtusHomework/tree/master/Reports)
 
-* [Очереди и SignalR](https://github.com/olegtar83/OtusHomework/tree/master/Reports/Queues)
-* [Реплика на постгре](https://github.com/olegtar83/OtusHomework/tree/master/Reports/Replica)
-* [Шардирование на постгре](https://github.com/olegtar83/OtusHomework/tree/master/Reports/Sharding)
-* [Кэширование с редис](https://github.com/olegtar83/OtusHomework/tree/master/Reports/Cache)
-* [Tarantool](https://github.com/olegtar83/OtusHomework/tree/master/Reports/Tarantool)
-* [Репликация и балансировка](https://github.com/olegtar83/OtusHomework/tree/master/Reports/LoadBalancing)
-* [Сага с каунтерами](https://github.com/olegtar83/OtusHomework/tree/master/Reports/Saga)
+* [Очереди и SignalR](https://github.com/olegtar83/OtusHomework/tree/master/Reports/Queues) 🔥
+* [Реплика на постгре](https://github.com/olegtar83/OtusHomework/tree/master/Reports/Replica) 👹
+* [Шардирование на постгре](https://github.com/olegtar83/OtusHomework/tree/master/Reports/Sharding) 👹
+* [Кэширование с редис](https://github.com/olegtar83/OtusHomework/tree/master/Reports/Cache) ✈️
+* [Tarantool](https://github.com/olegtar83/OtusHomework/tree/master/Reports/Tarantool) 🎡
+* [Репликация и балансировка](https://github.com/olegtar83/OtusHomework/tree/master/Reports/LoadBalancing) ✈️
+* [Сага с каунтерами](https://github.com/olegtar83/OtusHomework/tree/master/Reports/Saga) 🔥
 
   
 

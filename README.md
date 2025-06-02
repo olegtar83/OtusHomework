@@ -25,7 +25,7 @@ docker-compose up -d --build
 * [Кэширование с редис](https://github.com/olegtar83/OtusHomework/tree/master/Reports/Cache) ✈️
 * [Tarantool](https://github.com/olegtar83/OtusHomework/tree/master/Reports/Tarantool) 🎡
 * [Репликация и балансировка](https://github.com/olegtar83/OtusHomework/tree/master/Reports/LoadBalancing) 🚑
-* [Сага с каунтерами](https://github.com/olegtar83/OtusHomework/tree/master/Reports/Saga) 🔥
+* [Сага с каунтерами](https://github.com/olegtar83/OtusHomework/tree/master/Reports/Saga) :rage2:
 
   
 

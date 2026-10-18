@@ -27,7 +27,7 @@ services:
       retries: 5
   postgresql-master:
     container_name: postgresql-master
-    image: 'docker.io/bitnami/postgresql:11-debian-10'
+    image: 'bitnamilegacy/postgresql:11'
     ports:
       - '5432:5432'
     volumes:
@@ -51,7 +51,7 @@ services:
       retries: 5
   postgresql-slave1:
       container_name: postgresql-slave1
-      image: 'docker.io/bitnami/postgresql:11-debian-10'
+      image: 'bitnamilegacy/postgresql:11'
       ports:
         - 5433:5432
       depends_on:
@@ -72,7 +72,7 @@ services:
       - legendary-network
   postgresql-slave2:
       container_name: postgresql-slave2
-      image: 'docker.io/bitnami/postgresql:11-debian-10'
+      image: 'bitnamilegacy/postgresql:11'
       ports:
         - 5434:5432
       depends_on:
@@ -316,6 +316,34 @@ services:
     entrypoint: dotnet LegendarySocialNetwork.Counter.dll
     networks:
       - legendary-network
+  assistant-api:
+    image: assistant-api-image
+    build:
+      context: ./src
+      dockerfile: LegendarySocialNetwork.Assistant/Dockerfile
+    container_name: assistant-api
+    restart: always
+    environment:
+      # Основные настройки для работы API
+      ASPNETCORE_URLS: "http://+:80"
+      AllowedHosts: "*" 
+      DatabaseSettings:VectorConnStr: "Host=assistant-db;Port=5432;Username=assistant;Password=assistant;Database=assistant;"
+      DatabaseSettings:MessagesConnStr: "Host=messages-db;Port=5432;Username=dbuser;Password=dbpassword;Database=legendarydb;Pooling=true;Maximum Pool Size=1450;Minimum Pool Size=300;Timeout=600;CommandTimeout=600;Connection Idle Lifetime=300;Connection Pruning Interval=10;Keepalive=60;TCP Keepalive Time=60;TCP Keepalive Interval=10"
+      Embeddings:Url: http://embeddings:8000/v1
+      Embeddings:Model: intfloat/multilingual-e5-small
+      Kafka__Host: kafka:29092
+      ModelUrl: http://vllm:8000/v1
+      ModelName: Qwen/Qwen2.5-0.5B-Instruct
+    ports:
+      - 7890:80
+    mem_limit: 2048m
+    entrypoint: dotnet LegendarySocialNetwork.Assistant.dll
+    depends_on:
+      - vllm
+      - embeddings
+      - assistant-db
+    networks:
+      - legendary-network
   tarantool:
     build:
       context: .
@@ -449,6 +477,55 @@ services:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_BASIC_ENABLED=false
       - GF_INSTALL_PLUGINS=alexanderzobnin-zabbix-app
+  vllm:
+    image: vllm/vllm-openai-cpu:latest-arm64
+    container_name: vllm
+    ports:
+      - "8011:8000"
+    volumes:
+      - huggingface-cache:/root/.cache/huggingface
+    command:
+      - "--model"
+      - "Qwen/Qwen2.5-0.5B-Instruct"
+      - "--gpu-memory-utilization"
+      - "0.25"
+      - "--max-model-len"
+      - "2048"
+    shm_size: "1gb"
+    networks:
+      - legendary-network
+  embeddings:
+    image: vllm/vllm-openai-cpu:latest-arm64
+    container_name: embeddings
+    ports:
+      - "8012:8000"
+    volumes:
+      - huggingface-embed-cache:/root/.cache/huggingface
+    command:
+      - "--model"
+      - "intfloat/multilingual-e5-small"
+      - "--runner"
+      - "pooling"
+      - "--gpu-memory-utilization"
+      - "0.15"
+      - "--max-model-len"
+      - "512"
+    shm_size: "256mb"
+    networks:
+      - legendary-network
+  assistant-db:
+    image: pgvector/pgvector:pg16
+    container_name: assistant-db
+    environment:
+      POSTGRES_DB: assistant
+      POSTGRES_USER: assistant
+      POSTGRES_PASSWORD: assistant
+    ports:
+      - "5436:5432"
+    volumes:
+      - assistant-db-data:/var/lib/postgresql/data
+    networks:
+      - legendary-network
 volumes:
   kafka-data:
   healthcheck-volume:
@@ -458,6 +535,9 @@ volumes:
   tarantool-data:
   pg_zabbix-data:
   zabbix-server-data:
+  huggingface-cache:
+  huggingface-embed-cache:
+  assistant-db-data:
 networks:
   legendary-network:
     driver: bridge

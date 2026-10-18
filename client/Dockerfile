@@ -8,13 +8,14 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm ci
 
 # Now copy the rest of the application code
 COPY . .
 
-# Build the application
-RUN npm ci
+# Build the application. Create React App writes the output to /app/build.
+ENV CI=false
+RUN npm run build
 
 # Production stage
 FROM nginx:alpine

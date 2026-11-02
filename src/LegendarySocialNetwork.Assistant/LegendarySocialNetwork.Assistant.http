@@ -1,0 +1,6 @@
+@LegendarySocialNetwork.Assistant_HostAddress = http://localhost:5266
+
+GET {{LegendarySocialNetwork.Assistant_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,5 @@
+{
+  "dotnet.defaultSolution": "src/LegendarySocialNetwork.sln",
+  "dotnet.backgroundAnalysis.compilerDiagnosticsScope": "openFiles",
+  "editor.lightbulb.enabled": "on"
+}
